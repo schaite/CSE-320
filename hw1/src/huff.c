@@ -168,8 +168,9 @@ int decompress_block() {
  * @return 0 if compression completes without error, -1 if an error occurs.
  */
 int compress() {
-    while(compress_block()!= -1);
-        return 0;
+    // while(compress_block()!= -1);
+    //     return 0;
+    abort();
 }
 
 /**
@@ -183,9 +184,10 @@ int compress() {
  * @return 0 if decompression completes without error, -1 if an error occurs.
  */
 int decompress() {
-    while(decompress_block()!=-1){
-        return 0;
-    }
+    // while(decompress_block()!=-1){
+    //     return 0;
+    // }
+    abort();
 }
 
 /**

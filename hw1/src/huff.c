@@ -40,9 +40,71 @@
  * Huffman tree used to compress the current block.  Refer to the assignment handout
  * for a detailed specification of the format of this description.
  */
+//function for printing the post order traversal
+void postorder_traversal(NODE *node, int *index, unsigned char *current_byte){
+    if(node == NULL){
+        return;
+    }
+    postorder_traversal(node->left,index, current_byte);
+    postorder_traversal(node->right,index,current_byte);
+    if(node->left==NULL && node->right==NULL){
+        //o is already added, so no need to changen anything
+    }
+    else{
+       *current_byte |= (1<<*index);
+    }
+
+    //printing each byte
+    if(*index==0){
+        fputc(*current_byte,stdout);
+        *current_byte = 0;
+        *index = 7;
+    }
+    else{
+        (*index)--;
+    }
+}
+//function to print the leaf nodes
+void print_leaves(NODE *node){
+    if(node==NULL){
+        return;
+    }
+    print_leaves(node->left);
+    print_leaves(node->right);
+    if(node->left==NULL && node->right==NULL){
+        if(node->symbol==255){
+            fputc(255,stdout);
+            fputc(0,stdout);
+        }
+        else{
+            fputc((char)node->symbol,stdout);
+        }
+    }
+}
+
 void emit_huffman_tree() {
-    // To be implemented.
-    abort();
+    unsigned char current_byte = 0;
+    int index = 7;
+
+    //Output the number of nodes in big endian order
+
+    //first byte containing 'n'
+    unsigned char high_byte = (unsigned char)((num_nodes>>8)&0xff);
+    //second byte containing 'n'
+    unsigned char low_byte = (unsigned char)(num_nodes&0xff);
+    fputc(high_byte,stdout);
+    fputc(low_byte,stdout);
+
+    //perform a postorder traversal of the tree
+    current_byte = 0;
+    index = 7;
+    postorder_traversal(nodes,&index,&current_byte);
+    //if any remaining bits are left
+    if(index<7){
+        fputc(current_byte, stdout);
+    }
+    //Output symbol values at the leaves of the tree
+    print_leaves(nodes);
 }
 
 /**
@@ -106,8 +168,8 @@ int decompress_block() {
  * @return 0 if compression completes without error, -1 if an error occurs.
  */
 int compress() {
-    // To be implemented.
-    abort();
+    while(compress_block()!= -1);
+        return 0;
 }
 
 /**
@@ -121,8 +183,9 @@ int compress() {
  * @return 0 if decompression completes without error, -1 if an error occurs.
  */
 int decompress() {
-    // To be implemented.
-    abort();
+    while(decompress_block()!=-1){
+        return 0;
+    }
 }
 
 /**
@@ -141,8 +204,113 @@ int decompress() {
  * @modifies global variable "global_options" to contain a bitmap representing
  * the selected options.
  */
+//Helper functions
+int is_digit(char ch){
+    return (ch>='0'&&ch <= '9');
+}
+int string_to_int(char *str){
+    int result = 0;
+    while(*str != '\0' && is_digit(*str)){
+        result = result*10 + (*str-'0');
+        str++;
+    }
+    return result;
+}
+int valid_block_size(char *block_size){
+    char *ptr = block_size;
+    //confirm that block_size only contains digits
+    while(*ptr!='\0'){
+        if(!is_digit(*ptr)){
+            return 0;
+        }
+        ptr++;
+    }
+    //confirm blocksize if within range
+    int size = string_to_int(block_size);
+    return (size>=1024 && size <=65536);
+
+}
 int validargs(int argc, char **argv)
 {
-    // To be implemented.
-    abort();
+    //initialize global_options to default value
+    global_options = 0x0;
+    //No flags are provided
+    if(argc==1){
+        return -1;
+    }
+    //iteragte over the args
+    for(int i = 1; i<argc; i++){
+        //arg contains current argument
+        char *arg = *(argv+i);
+        //if the arg is -, check what's the next arg and set the global option.
+        if(*arg=='-'){
+            switch(*(arg+1)){
+            case 'h':
+                if(i==1){
+                    global_options |= 0x1; //-h bit set
+                    return 0; //no arg before -h, success
+                }
+                else{
+                    return -1; //-h is not the first flag
+                }
+                break;
+            case 'c':
+                if(global_options){//checks if there were some flag before
+                    return -1;
+                }
+                else{
+                    if(argc==i+1){
+                        global_options |= 0xffff0002;
+                        return 0;
+                    }
+                    else{
+                        global_options |= 0x2;
+                    }
+                }
+                break;
+            case 'd':
+                if(global_options){//checks if some flag was already set
+                    return -1;
+                }
+                else{
+                    if(i==argc-1){
+                        global_options |= 0xffff0004;
+                        return 0;
+                    }
+                    else{
+                        return -1;
+                    }
+                }
+                break;
+            case 'b':
+                i++;
+                //check blocksize
+                if((i>=argc) || (!valid_block_size(*(argv+i)))){
+                    return -1;
+                }
+                //check if -c has been set
+                else if(global_options==0x2){
+                    /*
+                    * Check blocksize is given
+                    * Check that the given blocksize is a number in range [1024,65536]
+                    * Set the blocksize in global_options
+                    */
+                    int block_size =string_to_int(*(argv+i))-1;
+                    global_options &= 0x0000ffff; //clear the previous blocksize
+                    global_options |= ((block_size<<16)&0xffff0000);
+                    return 0;
+                }
+                else{
+                    return -1; //-b option came although -c wasn't set
+                }
+                break;
+            default: return -1;
+                break;
+            }
+        }
+
+    }
+    return -1;
 }
+
+

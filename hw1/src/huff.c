@@ -212,8 +212,6 @@ int read_huffman_tree() {
  *
  * @return 0 if compression completes without error, -1 if an error occurs.
  */
-//Helpers for construct_block()
-//interserts nodes maintaining a makeshift priority queue
 void insert_node(int *queue_size, NODE *new_node){
     int i;
     for(i = *queue_size; i>0; i--){
@@ -257,10 +255,6 @@ void build_huffman_tree(int queue_size){
         //insert the new parent
         insert_node(&queue_size,&parent_node);
         queue_size++;
-    }
-}
-void write_bit(int bit, unsigned char **current_byte, int *bit_index){
-    if(bit){
     }
 }
 
@@ -317,9 +311,31 @@ int compress_block() {
  * @return 0 if decompression completes without error, -1 if an error occurs.
  */
 int decompress_block() {
-    // To be implemented.
-    abort();
+    NODE *current_node =  nodes;
+    int byte;
+    while((byte=fgetc(stdin))!=EOF){
+        for(int i = 7; i>=0;i--){
+            int current_bit = (byte>>i)&1;
+            if(current_bit==0){
+                current_node = current_node->left;
+            }
+            else{
+                current_node=current_node->right;
+            }
+            if(current_node->left==NULL&&current_node->right==NULL){
+                if(current_node->symbol == END_OF_BLOCK){
+                    return 0;
+                }
+                fputc(current_node->symbol,stdout);
+                current_node = nodes;
+            }
+        }
+    }
+    return (feof(stdin)&& !ferror(stdin))?0:-1;
 }
+
+
+
 
 /**
  * @brief Reads raw data from standard input, writes compressed data to
@@ -354,11 +370,16 @@ int compress() {
  * @return 0 if decompression completes without error, -1 if an error occurs.
  */
 int decompress() {
-    // while(decompress_block()!=-1){
-    //     return 0;
-    // }
-    abort();
+    while(!feof(stdin)){
+        if(decompress_block()==-1){
+            return -1;
+        }
+    }
+    fflush(stdout);
+    return 0;
 }
+
+
 
 /**
  * @brief Validates command line arguments passed to the program.

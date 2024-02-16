@@ -17,6 +17,8 @@
 #error "Do not #include <ctype.h>. You will get a ZERO."
 #endif
 
+#define END_OF_BLOCK (256)
+
 /*
  * You may modify this file and/or move the functions contained here
  * to other source files (except for main.c) as you wish.
@@ -72,7 +74,7 @@ void print_leaves(NODE *node){
     print_leaves(node->left);
     print_leaves(node->right);
     if(node->left==NULL && node->right==NULL){
-        if(node->symbol==255){
+        if(node->symbol==END_OF_BLOCK){
             fputc(255,stdout);
             fputc(0,stdout);
         }
@@ -119,9 +121,85 @@ void emit_huffman_tree() {
  * @return 0 if the tree is read and reconstructed without error, 1 if EOF is
  * encountered at the start of a block, otherwise -1 if an error occurs.
  */
+int assign_symbols(NODE *node){
+    if(node==NULL) return 0;
+    if(assign_symbols(node->left)!=0) return -1;
+    if(assign_symbols(node->right)!=0) return -1;
+    if(node->left == NULL&&node->right==NULL){
+        int symbol_read = fgetc(stdin);
+        if(symbol_read==EOF){
+            return -1;
+        }
+        node->symbol = (short)symbol_read;
+    }
+    return 0;
+}
 int read_huffman_tree() {
-    // To be implemented.
-    abort();
+    int stack_ptr = 0;
+    //reading the first two bytes which holds the number of nodes
+    num_nodes = fgetc(stdin);
+    if(num_nodes == EOF){
+        return -1;
+    }
+    num_nodes = num_nodes << 8;
+    int temp = fgetc(stdin);
+    if(num_nodes == EOF){
+        return -1;
+    }
+    num_nodes |= temp;
+    //initializing the nodes array declarded in huff.h
+    for(int i = 0; i<num_nodes; i++){
+        (nodes+i)->left = NULL;
+        (nodes+i)->right = NULL;
+        (nodes+i)->parent = NULL;
+        (nodes+i)->symbol = -1;
+    }
+    //read and process bits until all nodes are accounted for
+    int bits_read = 0;
+    int bit_value;
+    int current_byte = 0;
+    int index = 0;
+
+    while(bits_read < num_nodes-1){
+        if(index==0){
+            current_byte = fgetc(stdin);
+            if(current_byte==EOF){
+                return -1;
+            }
+        }
+        //get the next bit
+        bit_value = (current_byte>>(7-index))&0x1;
+        //increment the index
+        index = (index+1)%8;
+
+        if(bit_value==1){
+
+            if(stack_ptr<2) return -1;
+            //pop two nodes from the stack
+            NODE *rightChild = *(node_for_symbol+(--stack_ptr));
+            NODE *leftChild = *(node_for_symbol+(--stack_ptr));
+
+            //create a parent for the children
+            NODE *parent = nodes+stack_ptr;
+            parent->left = leftChild;
+            parent->right = rightChild;
+
+            //add parent to the top of the stack
+            *(node_for_symbol+stack_ptr)=parent;
+            stack_ptr++;
+        }
+        else{
+            *(node_for_symbol+stack_ptr) = nodes + stack_ptr;
+            stack_ptr++;
+        }
+        //increment the number of bits read
+        bits_read++;
+    }
+    //assign symbols to the leaves!!!!
+    if(assign_symbols(nodes)!=0){
+        return -1;
+    }
+    return 0;
 }
 
 /**

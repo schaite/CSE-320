@@ -16,7 +16,6 @@
 #ifdef _CTYPE_H
 #error "Do not #include <ctype.h>. You will get a ZERO."
 #endif
-
 #define END_OF_BLOCK (256)
 
 /*
@@ -213,9 +212,97 @@ int read_huffman_tree() {
  *
  * @return 0 if compression completes without error, -1 if an error occurs.
  */
+//Helpers for construct_block()
+//interserts nodes maintaining a makeshift priority queue
+void insert_node(int *queue_size, NODE *new_node){
+    int i;
+    for(i = *queue_size; i>0; i--){
+        if((nodes+i-1)->weight>new_node->weight){
+            *(nodes+i) = *(nodes+i-1);
+        }
+        else{
+            break;
+        }
+    }
+    *(nodes+i) = *new_node;
+    (*queue_size)++;
+}
+//initializes the leaves with
+void init_leaves(int *queue_size){
+    NODE *node_ptr = nodes;
+    for(int i = 0; i<MAX_SYMBOLS; i++,node_ptr++){
+        if(node_ptr->weight>0){
+            insert_node(queue_size,node_ptr);
+        }
+    }
+}
+NODE create_parent_node(NODE *left_child, NODE *right_child){
+    NODE parent_node;
+    parent_node.left = left_child;
+    parent_node.right = right_child;
+    parent_node.weight = left_child->weight + right_child->weight;
+    parent_node.symbol=-1;//indicates internal node
+    return parent_node;
+}
+void build_huffman_tree(int queue_size){
+    while(queue_size>1){
+        NODE *left_child = nodes;
+        NODE *right_child = nodes+1;
+        NODE parent_node =  create_parent_node(left_child,right_child);
+        //clean the left and rightchild space in the array
+        for(int i = 2; i<queue_size; i++){
+            *(nodes+i-2) = *(nodes+i);
+        }
+        queue_size-=2;
+        //insert the new parent
+        insert_node(&queue_size,&parent_node);
+        queue_size++;
+    }
+}
+void write_bit(int bit, unsigned char **current_byte, int *bit_index){
+    if(bit){
+    }
+}
+
 int compress_block() {
-    // To be implemented.
-    abort();
+    int queue_size = 0;
+
+    //1. Initialize the histogram with all possible characters
+    for(int i = 0; i<MAX_SYMBOLS; i++){
+        NODE *current_node = nodes+i;
+        current_node->left = NULL;
+        current_node->right = NULL;
+        current_node->parent = NULL;
+        current_node->symbol = i;
+        current_node->weight = 0;
+    }
+    //get the blocksize, add one as it was substracted while adding the blocksize
+    int block_size = ((global_options>>16)&0xFFFF)+1;
+    //2. Add frequencies for all symbols
+    //bit counter for the block
+    int count = 0;
+    while(count<block_size){
+        int ch = fgetc(stdin);
+        if(ch == EOF){
+            if(ferror(stdin)){
+                return -1;
+            }
+            break;
+        }
+        //increment weight for the character encountered
+        (nodes+ch)->weight++;
+        //increment bit counter
+        count++;
+    }
+    //set the END marker to -1
+    (nodes+MAX_SYMBOLS-1)->weight = -1;
+    //3. Initialize leaf nodes for non-zero frequesncies
+    init_leaves(&queue_size);
+    //4.Build the huffman tree
+    build_huffman_tree(queue_size);
+    //5. Emit_huffman_tree
+    emit_huffman_tree();
+    return 0;
 }
 
 /**
@@ -246,9 +333,14 @@ int decompress_block() {
  * @return 0 if compression completes without error, -1 if an error occurs.
  */
 int compress() {
-    // while(compress_block()!= -1);
-    //     return 0;
-    abort();
+    while(!feof(stdin)){
+        if(compress_block()==-1){
+            return -1;
+        }
+    }
+    fflush(stdout);
+    return 0;
+    //abort();
 }
 
 /**
@@ -392,5 +484,3 @@ int validargs(int argc, char **argv)
     }
     return -1;
 }
-
-

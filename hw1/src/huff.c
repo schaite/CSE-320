@@ -312,6 +312,9 @@ int compress_block() {
  */
 int decompress_block() {
     NODE *current_node =  nodes;
+    debug("nooooooooooooooo");
+    read_huffman_tree();
+    debug("read");
     int byte;
     while((byte=fgetc(stdin))!=EOF){
         for(int i = 7; i>=0;i--){
@@ -326,11 +329,13 @@ int decompress_block() {
                 if(current_node->symbol == END_OF_BLOCK){
                     return 0;
                 }
+              //debug("%c",current_node->symbol);
                 fputc(current_node->symbol,stdout);
                 current_node = nodes;
             }
         }
     }
+    debug("please work");
     return (feof(stdin)&& !ferror(stdin))?0:-1;
 }
 
@@ -370,7 +375,9 @@ int compress() {
  * @return 0 if decompression completes without error, -1 if an error occurs.
  */
 int decompress() {
+    debug("%s","stressssss");
     while(!feof(stdin)){
+        debug("ajdgagdakjgd");
         if(decompress_block()==-1){
             return -1;
         }

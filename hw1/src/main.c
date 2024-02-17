@@ -22,27 +22,10 @@ int main(int argc, char **argv)
     if(validargs(argc, argv))
         USAGE(*argv, EXIT_FAILURE);
     debug("Options: 0x%x", global_options);
-    if(global_options & 1){
+    if(global_options & 1)
         USAGE(*argv, EXIT_SUCCESS);
-        return EXIT_SUCCESS;
-    }
 
-
-    if(global_options&(1<<1)){
-        if(compress()==-1){
-            return EXIT_FAILURE;
-        }
-        return EXIT_SUCCESS;
-    }
-
-    if(global_options&(1<<2)){
-        if(decompress()==-1){
-            return EXIT_FAILURE;
-        }
-        return EXIT_SUCCESS;
-    }
-    USAGE(*argv,EXIT_FAILURE);
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 
 }
 

@@ -1,6 +1,12 @@
 bin/
 build/
+<<<<<<< HEAD
 test_output/
 *~
 *.out
 *.bak
+=======
+*~
+*.out
+*.au
+>>>>>>> HW2_CODE/master

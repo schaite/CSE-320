@@ -135,17 +135,21 @@ int assign_symbols(NODE *node){
 }
 int read_huffman_tree() {
     int stack_ptr = 0;
+    debug("read huff");
     //reading the first two bytes which holds the number of nodes
     num_nodes = fgetc(stdin);
+    debug("%d",num_nodes);
     if(num_nodes == EOF){
         return -1;
     }
     num_nodes = num_nodes << 8;
+    debug("%d",num_nodes);
     int temp = fgetc(stdin);
     if(num_nodes == EOF){
         return -1;
     }
     num_nodes |= temp;
+    debug("%d",num_nodes);
     //initializing the nodes array declarded in huff.h
     for(int i = 0; i<num_nodes; i++){
         (nodes+i)->left = NULL;
@@ -162,6 +166,7 @@ int read_huffman_tree() {
     while(bits_read < num_nodes-1){
         if(index==0){
             current_byte = fgetc(stdin);
+            debug("%x",current_byte);
             if(current_byte==EOF){
                 return -1;
             }
@@ -196,6 +201,7 @@ int read_huffman_tree() {
     }
     //assign symbols to the leaves!!!!
     if(assign_symbols(nodes)!=0){
+        debug("dytafgafhsdgad");
         return -1;
     }
     return 0;
@@ -312,18 +318,32 @@ int compress_block() {
  */
 int decompress_block() {
     NODE *current_node =  nodes;
-    debug("nooooooooooooooo");
     read_huffman_tree();
-    debug("read");
+    // debug("read");
     int byte;
     while((byte=fgetc(stdin))!=EOF){
+        //debug("read2");
         for(int i = 7; i>=0;i--){
+            //debug("red4");
             int current_bit = (byte>>i)&1;
+            //debug("red3");
             if(current_bit==0){
-                current_node = current_node->left;
+                // debug("red5");
+                 if(current_node->left==NULL){
+                    //debug("jakf");
+                 }
+                 else{
+                    current_node = current_node->left;
+                 }
             }
             else{
-                current_node=current_node->right;
+                if(current_node->right==NULL){
+                    //debug("jakfhvf");
+                 }
+                 else{
+                    current_node=current_node->right;
+                 }
+
             }
             if(current_node->left==NULL&&current_node->right==NULL){
                 if(current_node->symbol == END_OF_BLOCK){
@@ -334,6 +354,7 @@ int decompress_block() {
                 current_node = nodes;
             }
         }
+       // debug("after for loop");
     }
     debug("please work");
     return (feof(stdin)&& !ferror(stdin))?0:-1;

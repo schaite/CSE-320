@@ -465,14 +465,20 @@ int dtmf_detect(FILE *audio_in, FILE *events_out) {
 }
 
 int check_str_equal(char* str1, char* str2) {
-	while (*str1 == *str2) {
-		str1 += 1;
-		str2 += 1;
-	}
+	// while (*str1 == *str2) {
+	// 	str1 += 1;
+	// 	str2 += 1;
+	// }
 
-	if (*str1 == '\0' && *str2 == '\0') {
+	// if (*(str1-1) == '\0' && *(str2-1) == '\0') {
+	// 	return 1;
+	// } else {
+	// 	return 0;
+	// }
+	if((*str1==*str2)&&(*(str1+1)==*(str2+1))){
 		return 1;
-	} else {
+	}
+	else{
 		return 0;
 	}
 }
@@ -540,12 +546,15 @@ int is_valid_str_to_int(char* str_num) {
  */
 int validargs(int argc, char **argv)
 {
-	if (check_str_equal(*(argv), "-h")) {
+	if(argc<2){
+		return -1;
+	}
+	if (check_str_equal(*(argv+1), "-h")) {
 		// -h was used
     	global_options = 1;
     	return 0;
 	}
-	if (check_str_equal(*(argv), "-g")) {
+	if (check_str_equal(*(argv+1), "-g")) {
 		// -g was used
 		global_options = 2;
 		argv += 1;
@@ -559,11 +568,11 @@ int validargs(int argc, char **argv)
 		char* n_command_value;
 		int l_command_value;
 
-		while (argc > 0) {
-			char* command = *argv;
-			char* argument = *(argv+1);
+		while (argc > 2) {
+			char* command = *(argv+1);
+			char* argument = *(argv+2);
 
-			if (argc % 2 == 1) {
+			if (argc % 2 == 0) {
 				// Means there is not a corresponding argument for each tag
 				return -1;
 			}
@@ -634,22 +643,26 @@ int validargs(int argc, char **argv)
 
     	return 0;
 	}
-	if (check_str_equal(*(argv), "-d")) {
+	if (check_str_equal(*(argv+1), "-d")) {
 		// -d was used
 		global_options = 4;
 		argv += 1;
 		argc -= 1;
 
-		if (argc > 2) {
-			return -1;
-		}
-		if (argc == 0) {
+		// if (argc > 2) {//why??
+		// 	return -1;
+		// }
+
+		if (argc == 1) {
 			block_size = 100;
 			return 0;
 		}
+		if(argc!=3){
+			return -1; //for it to have the -b option, must be 4 args
+		}
 
-		char* command = *argv;
-		char* argument = *(argv+1);
+		char* command = *(argv+1);
+		char* argument = *(argv+2);
 
 		if (check_str_equal(command, "-b")) {
 			if (is_valid_str_to_int(argument)) {

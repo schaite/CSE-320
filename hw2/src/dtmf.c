@@ -133,6 +133,7 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 	empty_header.channels = 1;
 
 	if (audio_write_header(stdout, &empty_header) == EOF) {
+		printf("Line 136");
 		return EOF;
 	}
 
@@ -150,7 +151,10 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 
 		a = fgetc(events_in);
 		while(a != '\t') {
-			if (a == EOF) { break; }
+			if (a == EOF) { 
+				printf("Line 155");
+				break; 
+				}
 			if (char_to_int(a) == -1) {
 				return EOF;
 			}
@@ -159,14 +163,19 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 		}
 
 		a = fgetc(events_in);
-		if (a == EOF) {return EOF; }
+		if (a == EOF) {
+			printf("line 167");
+			return EOF; }
 		row_freq = get_row_frequency(a);
 		col_freq = get_col_frequency(a);
 		if (row_freq == -1 || col_freq == -1) {
+			printf("line 172");
 			return EOF;
 		}
 		fgetc(events_in); // Get rid of \n
-		if (a == EOF) {return EOF; }
+		if (a == EOF){
+			printf("line 177");
+			return EOF; }
 	}
 
 	// printf("%d %d\n", starting, ending);
@@ -175,12 +184,12 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 	if (noise_file) {
 		opened_file = fopen(noise_file, "r");
 		if (!opened_file) {
-			// printf("Invalid file path\n");
+			printf("Invalid file path\n");
 			return EOF;
 		}
 		if (audio_read_header(opened_file, &empty_header) == EOF) {
 			// The file provided was in an incorrect format
-			// printf("File provided was in incorrect format\n");
+			printf("File provided was in incorrect format\n");
 			return EOF;
 		}
 	}
@@ -204,8 +213,11 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 			char a = fgetc(events_in);
 			if (a != EOF) {
 				while(a != '\t') {
-					if (a == EOF) { break; }
+					if (a == EOF) { 
+						printf("line 217");
+						break; }
 					if (char_to_int(a) == -1) {
+						printf("line 220");
 						return EOF;
 					}
 					starting = starting * 10 + char_to_int(a);
@@ -214,8 +226,11 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 
 				a = fgetc(events_in);
 				while(a != '\t') {
-					if (a == EOF) { break; }
+					if (a == EOF) { 
+						printf("line 230");
+						break; }
 					if (char_to_int(a) == -1) {
+						printf("line 233");
 						return EOF;
 					}
 					ending = ending * 10 + char_to_int(a);
@@ -223,14 +238,19 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 				}
 
 				a = fgetc(events_in);
-				if (a == EOF) { return EOF; }
+				if (a == EOF) {
+					printf("line 242");
+					return EOF; }
 				row_freq = get_row_frequency(a);
 				col_freq = get_col_frequency(a);
 				if (row_freq == -1 || col_freq == -1) {
+					printf("line 247");
 					return EOF;
 				}
 				fgetc(events_in); // Get rid of \n
-				if (a == EOF) { return EOF; }
+				if (a == EOF) { 
+					printf("line 252");
+					return EOF; }
 			}
 		}
 
@@ -465,16 +485,6 @@ int dtmf_detect(FILE *audio_in, FILE *events_out) {
 }
 
 int check_str_equal(char* str1, char* str2) {
-	// while (*str1 == *str2) {
-	// 	str1 += 1;
-	// 	str2 += 1;
-	// }
-
-	// if (*(str1-1) == '\0' && *(str2-1) == '\0') {
-	// 	return 1;
-	// } else {
-	// 	return 0;
-	// }
 	if((*str1==*str2)&&(*(str1+1)==*(str2+1))){
 		return 1;
 	}

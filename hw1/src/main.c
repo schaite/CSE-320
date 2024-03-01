@@ -22,10 +22,27 @@ int main(int argc, char **argv)
     if(validargs(argc, argv))
         USAGE(*argv, EXIT_FAILURE);
     debug("Options: 0x%x", global_options);
+    debug("1");
     if(global_options & 1)
         USAGE(*argv, EXIT_SUCCESS);
+    if(global_options &0x2){
+        if(compress()){
+            USAGE(*argv, EXIT_SUCCESS);
+        }
+        // else{
+        //     USAGE(*argv,EXIT_FAILURE);
+        // }
+    }
+    if(global_options&0x4){
+        debug("heree");
+    printf("hereee");
+        if(decompress()){
+            USAGE(*argv,EXIT_SUCCESS);
+        }
+    }
+    printf("here3");
 
-    return EXIT_SUCCESS;
+    return EXIT_FAILURE;
 
 }
 

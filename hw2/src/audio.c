@@ -5,21 +5,18 @@
 
 int audio_read_sample(FILE *in, int16_t *samplep) {
 	int16_t a = fgetc(in);
-	//printf("a=%x\n",a);
 	int16_t b = fgetc(in);
-	//printf("b=%x\n",b);
 	if (a == EOF || b == EOF) {
 		return EOF;
 	}
 	int16_t num = (a << 8) + b;
-	//printf("num: %x\n", num);
 	*(samplep) = num;
     return 0;
 }
 
 int audio_write_sample(FILE *out, int16_t sample) {
-    int16_t b = (sample << 8) >> 8;
-    int16_t a = (sample >> 8);
+    int16_t a = sample >> 8;
+    int16_t b = (sample<<8)>>8;
 
 	if (fputc(a, out) == EOF) {
 		return EOF;
@@ -39,29 +36,22 @@ uint32_t audio_reader_helper(FILE* in) {
 		return EOF;
 	}
 
-	uint32_t a_int = a;
-	uint32_t b_int = (0x0000ffff)&b;
-	//printf("b=%x\n",b_int);
+	uint32_t sum_int = a;
+	sum_int <<= 16;
+	sum_int += (b & 0xffff);
 
-	uint32_t sum_int = (a_int << 16) + b_int;
-	//printf("final sum: %x\n",sum_int);
 	return sum_int;
 }
 
 int audio_read_header(FILE *in, AUDIO_HEADER *hp) {
 	uint32_t magic_number = audio_reader_helper(in);
 	uint32_t data_offset = audio_reader_helper(in);
-	//printf("Start\n");
 	uint32_t data_size = audio_reader_helper(in);
-	//printf("end\n");
 	uint32_t encoding = audio_reader_helper(in);
 	uint32_t sample_rate = audio_reader_helper(in);
 	uint32_t channels = audio_reader_helper(in);
 
-	// making sure we had enough bytes
-
 	if (magic_number == EOF || data_offset == EOF || data_size == EOF || encoding == EOF || sample_rate == EOF || channels == EOF) {
-		// printf("%d\n", magic_number);
 		return EOF;
 	}
 	hp->magic_number = magic_number;
@@ -95,7 +85,7 @@ int audio_read_header(FILE *in, AUDIO_HEADER *hp) {
 
 int audio_write_header_helper(uint32_t num, FILE* out) {
 	int16_t a = num >> 16;
-	int16_t b = (num << 16) >> 16;
+	int16_t b = (num << 16)>>16;
 
 	if (audio_write_sample(out, a) == EOF || audio_write_sample(out, b) == EOF) {
 		return EOF;

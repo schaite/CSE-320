@@ -76,6 +76,14 @@ int char_to_int(char c) {
 }
 
 int dtmf_generate_helper(int num_untrunc, FILE* out) {
+	// int16_t a = num_untrunc >> 16;
+	//  int16_t b = num_untrunc;
+
+	// if (audio_write_sample(out, b) == EOF) {
+	//  	return EOF;
+	//  }
+
+	//  return 0;
 	return audio_write_sample(out, num_untrunc);
 }
 
@@ -133,123 +141,109 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 	empty_header.channels = 1;
 
 	if (audio_write_header(stdout, &empty_header) == EOF) {
-		printf("Line 136");
 		return EOF;
 	}
 
-	// getting the starting number
 	char a = fgetc(events_in);
-	if (a != EOF) {
-		while(a != '\t') {
-			if (a == EOF) { break; }
-			if (char_to_int(a) == -1) {
-				return EOF;
-			}
-			starting = starting * 10 + char_to_int(a);
-			a = fgetc(events_in);
-		}
-
-		a = fgetc(events_in);
-		while(a != '\t') {
-			if (a == EOF) { 
-				printf("Line 155");
-				break; 
-				}
-			if (char_to_int(a) == -1) {
-				return EOF;
-			}
-			ending = ending * 10 + char_to_int(a);
-			a = fgetc(events_in);
-		}
-
-		a = fgetc(events_in);
-		if (a == EOF) {
-			printf("line 167");
-			return EOF; }
-		row_freq = get_row_frequency(a);
-		col_freq = get_col_frequency(a);
-		if (row_freq == -1 || col_freq == -1) {
-			printf("line 172");
+	if (a == EOF) {
+		return EOF;
+	}
+	while(a != '\t') {
+		if (a == EOF) { break; }
+		if (char_to_int(a) == -1) {
 			return EOF;
 		}
-		fgetc(events_in); // Get rid of \n
-		if (a == EOF){
-			printf("line 177");
-			return EOF; }
+		starting = starting * 10 + char_to_int(a);
+		a = fgetc(events_in);
 	}
 
-	// printf("%d %d\n", starting, ending);
-	// printf("%d %d\n", row_freq, col_freq);
+	a = fgetc(events_in);
+	while(a != '\t') {
+		if (a == EOF) {break;}
+		if (char_to_int(a) == -1) {
+			return EOF;
+		}
+		ending = ending * 10 + char_to_int(a);
+		a = fgetc(events_in);
+	}
+	if((starting>ending)|| (starting>length)||(ending>length)){
+					return -1;
+				}
+
+	a = fgetc(events_in);
+	if (a == EOF) {return EOF; }
+	row_freq = get_row_frequency(a);
+	col_freq = get_col_frequency(a);
+	if (row_freq == -1 || col_freq == -1) {
+		return EOF;
+	}
+	fgetc(events_in); // Get rid of \n
+	if (a == EOF){return EOF; }
+
+
 	FILE* opened_file = 0;
 	if (noise_file) {
 		opened_file = fopen(noise_file, "r");
 		if (!opened_file) {
-			printf("Invalid file path\n");
 			return EOF;
 		}
 		if (audio_read_header(opened_file, &empty_header) == EOF) {
-			// The file provided was in an incorrect format
-			printf("File provided was in incorrect format\n");
 			return EOF;
 		}
 	}
-
 	for (int i = 0; i < length; i++) {
 		double dtmf = 0;
 		if (i >= starting && i < ending) {
-			double a = cos(2.0 * pi * row_freq * i / audio_frame_rate);
-			double b = cos(2.0 * pi * col_freq * i / audio_frame_rate);
-			double c = a * 0.5 + b * 0.5;
-			// printf("%lf %lf %d\n", a, b, INT16_MAX);
-			// printf("%d\n", INT16_MAX);s
+			double a = cos((2.0 * pi * row_freq * i) / audio_frame_rate);
+			double b = cos((2.0 * pi * col_freq * i )/ audio_frame_rate);
+			double c = (a * 0.5) + (b * 0.5);
 			dtmf = c * INT16_MAX;
-			// printf("%d\n", dtmf);
 		}
-
 		if (i > ending) {
 			starting = 0;
-			ending = 0;
 
 			char a = fgetc(events_in);
 			if (a != EOF) {
 				while(a != '\t') {
 					if (a == EOF) { 
-						printf("line 217");
 						break; }
 					if (char_to_int(a) == -1) {
-						printf("line 220");
 						return EOF;
 					}
 					starting = starting * 10 + char_to_int(a);
 					a = fgetc(events_in);
 				}
+				if(starting<ending){
+					return -1;
+				}
+
+				ending = 0;
 
 				a = fgetc(events_in);
 				while(a != '\t') {
 					if (a == EOF) { 
-						printf("line 230");
 						break; }
 					if (char_to_int(a) == -1) {
-						printf("line 233");
 						return EOF;
 					}
 					ending = ending * 10 + char_to_int(a);
 					a = fgetc(events_in);
 				}
 
+				if((starting>ending)|| (starting>length)||(ending>length)){
+					return -1;
+				}
+
 				a = fgetc(events_in);
-				if (a == EOF) {
-					printf("line 242");
-					return EOF; }
+				if (a == EOF) {return EOF; }
 				row_freq = get_row_frequency(a);
 				col_freq = get_col_frequency(a);
 				if (row_freq == -1 || col_freq == -1) {
-					printf("line 247");
 					return EOF;
 				}
+
 				fgetc(events_in); // Get rid of \n
 				if (a == EOF) { 
-					printf("line 252");
 					return EOF; }
 			}
 		}
@@ -257,15 +251,10 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 		if (opened_file) {
 			double w = get_w();
 			int16_t i_real;
-			// printf("\nW: %lf\n", w);
 			int i = audio_read_sample(opened_file, &i_real);
 			if (i != EOF) {
-				// printf("\nNoise: %lf\n", i_real * w);
-				// printf("Value: %lf\n", dtmf * (1 - w));
 				int z = dtmf * (1 - w) + i_real * w;
-				// printf("Final: %d\n", z);
 				dtmf = z;
-				// printf("Final: %d\n", dtmf);
 			}
 		}
 
@@ -341,10 +330,6 @@ int dtmf_detect(FILE *audio_in, FILE *events_out) {
 	char previous_event = 0;
 
 	while (1) {
-	// if (current_block > 0) { break; }
-	// printf("----------------\n");
-	// intializing the stuff
-		// printf("%d\n", current_block);
     for (int i = 0; i < 8; i++) {
     	int frequency = i_to_freq(i);
     	int N = block_size;
@@ -396,17 +381,12 @@ int dtmf_detect(FILE *audio_in, FILE *events_out) {
     int col = 4;
 
     for (int j = 0; j < 8; j++) {
-	    // getting the strongest row and column index
-	    // printf("%lf\n", *(j + goertzel_strengths));
 	    double value = *(j + goertzel_strengths);
-    	// printf("%lf\n", value);
     	if (j > 3) {
-    		// columns
     		if (value > *(col + goertzel_strengths)) {
     			col = j;
     		}
     	} else {
-    		// rows
     		if (value > *(row + goertzel_strengths)) {
     			row = j;
     		}
@@ -416,17 +396,12 @@ int dtmf_detect(FILE *audio_in, FILE *events_out) {
     double row_value = *(row + goertzel_strengths);
     double col_value = *(col + goertzel_strengths);
 
-    // printf("row: %lf, col: %lf\n", row_value, col_value);
-    // printf("row: %d, col: %d\n", row, col);
-
     int is_valid = 1;
 
     if (row_value + col_value >= .01) {
-    	// ratio test
     	double ratio = row_value / col_value;
     	double four_db = FOUR_DB;
     	if (ratio >= 1/four_db && ratio <= four_db) {
-    		// 6dB test
     		double six_db = SIX_DB;
     		for (int i = 0; i < 4; i++) {
     			if (i == row) {
@@ -448,18 +423,15 @@ int dtmf_detect(FILE *audio_in, FILE *events_out) {
     				double value = *(i + goertzel_strengths);
     				double new_ratio = col_value / value;
     				if (new_ratio < six_db) {
-    					// printf("col_value: %lf  ratio: %lf\n", col_value, new_ratio);
     					is_valid = 0;
     					break;
     				}
     			}
     		}
     	} else {
-    		// printf("strongest row: %lf | strongest col: %lf\n", row_value, col_value);
     		is_valid = 0;
     	}
     } else {
-    	// printf("Broke at B\n");
     	is_valid = 0;
    	}
 
@@ -481,7 +453,7 @@ int dtmf_detect(FILE *audio_in, FILE *events_out) {
 	}
 	} // ending the while loop
 	output_event(starting_block, current_block, previous_event, events_out);
-    return EOF;
+    return 0;
 }
 
 int check_str_equal(char* str1, char* str2) {

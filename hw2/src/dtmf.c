@@ -75,7 +75,7 @@ int char_to_int(char c) {
 	}
 }
 
-int dtmf_generate_helper(int num_untrunc, FILE* out) {
+int dtmf_generate_helper(int16_t num_untrunc, FILE* out) {
 	// int16_t a = num_untrunc >> 16;
 	//  int16_t b = num_untrunc;
 
@@ -140,7 +140,7 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 	empty_header.sample_rate = 8000;
 	empty_header.channels = 1;
 
-	if (audio_write_header(stdout, &empty_header) == EOF) {
+	if (audio_write_header(audio_out, &empty_header) == EOF) {
 		return EOF;
 	}
 
@@ -258,7 +258,7 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 			}
 		}
 
-		int dtmf_int = dtmf;
+		int16_t dtmf_int = dtmf;
 		dtmf_generate_helper(dtmf_int, audio_out);
 	}
 

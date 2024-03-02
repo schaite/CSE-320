@@ -15,8 +15,8 @@ int audio_read_sample(FILE *in, int16_t *samplep) {
 }
 
 int audio_write_sample(FILE *out, int16_t sample) {
-    int16_t a = sample >> 8;
-    int16_t b = (sample<<8)>>8;
+    int16_t a = (sample >> 8)&0xff;
+    int16_t b = sample & 0xff;
 
 	if (fputc(a, out) == EOF) {
 		return EOF;
@@ -84,8 +84,8 @@ int audio_read_header(FILE *in, AUDIO_HEADER *hp) {
 }
 
 int audio_write_header_helper(uint32_t num, FILE* out) {
-	int16_t a = num >> 16;
-	int16_t b = (num << 16)>>16;
+	int16_t a = (num >> 16) & 0xffff;
+	int16_t b = num & 0xffff;
 
 	if (audio_write_sample(out, a) == EOF || audio_write_sample(out, b) == EOF) {
 		return EOF;

@@ -24,7 +24,6 @@ void assert_equal_headers(AUDIO_HEADER *act, AUDIO_HEADER *exp) {
 	cr_assert_eq(act->encoding, exp->encoding,
 		     "Wrong value in encoding field (%u != expected value %u)",
 		     act->encoding, exp->encoding);
-
 	cr_assert_eq(act->channels, exp->channels,
 		     "Wrong value in channels field (%u != expected value %u)",
 		     act->channels, exp->channels);

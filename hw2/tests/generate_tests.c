@@ -161,6 +161,9 @@ Test(generate_suite, overlapping_events, .timeout=10)
 	setup_test(&ctx, events, nelem(events), 800, 4096);
 
 	int ret = dtmf_generate(ctx.fin, ctx.fout, ctx.nsamples);
+	if(ret==EOF){
+		//printf("generate tests");
+	}
 	cr_assert((ret == EOF),
 		  "Expected failure on DTMF generation but returned success");
 
@@ -265,6 +268,7 @@ Test(generate_suite, short_noise, .timeout=10)
 	const size_t noise_data_len =
 	    sizeof(AUDIO_HEADER) +
 	    1000 * AUDIO_FRAME_RATE / 1000 * sizeof(int16_t);
+		//printf("%lu\n",noise_data_len);
 	struct _test_context ctx;
 	char noise_data[noise_data_len];
 

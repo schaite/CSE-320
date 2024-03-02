@@ -9,7 +9,7 @@ int audio_read_sample(FILE *in, int16_t *samplep) {
 	if (a == EOF || b == EOF) {
 		return EOF;
 	}
-	int16_t num = (a << 8) + b;
+	int16_t num = (a << 8) + (b&0xff);
 	*(samplep) = num;
     return 0;
 }

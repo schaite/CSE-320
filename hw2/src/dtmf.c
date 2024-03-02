@@ -140,6 +140,9 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 	empty_header.sample_rate = 8000;
 	empty_header.channels = 1;
 
+	//debug("%d\n",length);
+	//printf("%d\n",length);
+
 	if (audio_write_header(audio_out, &empty_header) == EOF) {
 		return EOF;
 	}
@@ -168,7 +171,7 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 	}
 	if((starting>ending)|| (starting>length)||(ending>length)){
 					return -1;
-				}
+	}
 
 	a = fgetc(events_in);
 	if (a == EOF) {return EOF; }
@@ -193,13 +196,7 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 	}
 	for (int i = 0; i < length; i++) {
 		double dtmf = 0;
-		if (i >= starting && i < ending) {
-			double a = cos((2.0 * pi * row_freq * i) / audio_frame_rate);
-			double b = cos((2.0 * pi * col_freq * i )/ audio_frame_rate);
-			double c = (a * 0.5) + (b * 0.5);
-			dtmf = c * INT16_MAX;
-		}
-		if (i > ending) {
+		if (i >= ending) {
 			starting = 0;
 
 			char a = fgetc(events_in);
@@ -247,13 +244,22 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 					return EOF; }
 			}
 		}
-
+		if (i >= starting && i < ending) {
+			double a = cos((2.0 * pi * row_freq * i) / audio_frame_rate);
+			double b = cos((2.0 * pi * col_freq * i )/ audio_frame_rate);
+			double c = (a * 0.5) + (b * 0.5);
+			dtmf = c * INT16_MAX;
+		}
 		if (opened_file) {
 			double w = get_w();
 			int16_t i_real;
 			int i = audio_read_sample(opened_file, &i_real);
 			if (i != EOF) {
 				int z = dtmf * (1 - w) + i_real * w;
+				dtmf = z;
+			}
+			else{
+				int z = dtmf*(1-w);
 				dtmf = z;
 			}
 		}

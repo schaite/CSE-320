@@ -21,7 +21,7 @@
 #error "Do not #include <ctype.h>. You will get a ZERO."
 #endif
 
-int get_row_frequency(char symbol) {
+/*int get_row_frequency(char symbol) {
 	for(int i = 0; i < NUM_DTMF_ROW_FREQS; i++) {
 		for (int j = 0; j < NUM_DTMF_COL_FREQS; j++) {
 			if (*(*(dtmf_symbol_names+i)+j) == symbol) {
@@ -42,9 +42,9 @@ int get_row_frequency(char symbol) {
 	}
 
 	return -1;
-}
+}*/
 
-int get_col_frequency(char symbol) {
+/*int get_col_frequency(char symbol) {
 	for(int i = 0; i < NUM_DTMF_ROW_FREQS; i++) {
 		for (int j = 0; j < NUM_DTMF_COL_FREQS; j++) {
 			if (*(*(dtmf_symbol_names+i)+j) == symbol) {
@@ -64,6 +64,20 @@ int get_col_frequency(char symbol) {
 		}
 	}
 	return -1;
+}*/
+
+int get_frequency(char symbol, int type){
+	switch(symbol){
+		case '1':case '2':case '3': case 'A': 
+			return type == 0? 697 : (symbol == '1'? 1209 : symbol == '2'? 1336 : symbol == '3'? 1477 : 1633);
+		case '4':case '5':case '6': case 'B': 
+			return type == 0? 770 : (symbol == '4'? 1209 : symbol == '5'? 1336 : symbol == '6'? 1477 : 1633);
+		case '7':case '8':case '9': case 'C': 
+			return type == 0? 852 : (symbol == '7'? 1209 : symbol == '8'? 1336 : symbol == '9'? 1477 : 1633);
+		case '*':case '0':case '#': case 'D': 
+			return type == 0? 941 : (symbol == '*'? 1209 : symbol == '0'? 1336 : symbol == '#'? 1477 : 1633);;
+		default: return -1;
+	}
 }
 
 int char_to_int(char c) {
@@ -75,24 +89,7 @@ int char_to_int(char c) {
 	}
 }
 
-int dtmf_generate_helper(int16_t num_untrunc, FILE* out) {
-	// int16_t a = num_untrunc >> 16;
-	//  int16_t b = num_untrunc;
 
-	// if (audio_write_sample(out, b) == EOF) {
-	//  	return EOF;
-	//  }
-
-	//  return 0;
-	return audio_write_sample(out, num_untrunc);
-}
-
-double get_w() {
-	double z = pow(10, noise_level / 10.0);
-	// printf("%d\n", noise_level);
-	// printf("%lf\n", z / (1 + z));
-	return z / (1.0 + z);
-}
 
 /*
  * You may modify this file and/or move the functions contained here
@@ -140,48 +137,16 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 	empty_header.sample_rate = 8000;
 	empty_header.channels = 1;
 
-	//debug("%d\n",length);
-	//printf("%d\n",length);
+	double angular_row_freq;
+	double angular_col_freq;	
+
+	double temp = pow(10, noise_level/10.0);
+	double w = temp/(1.0+temp);
+
 
 	if (audio_write_header(audio_out, &empty_header) == EOF) {
 		return EOF;
 	}
-
-	char a = fgetc(events_in);
-	if (a == EOF) {
-		return EOF;
-	}
-	while(a != '\t') {
-		if (a == EOF) { break; }
-		if (char_to_int(a) == -1) {
-			return EOF;
-		}
-		starting = starting * 10 + char_to_int(a);
-		a = fgetc(events_in);
-	}
-
-	a = fgetc(events_in);
-	while(a != '\t') {
-		if (a == EOF) {break;}
-		if (char_to_int(a) == -1) {
-			return EOF;
-		}
-		ending = ending * 10 + char_to_int(a);
-		a = fgetc(events_in);
-	}
-	if((starting>ending)|| (starting>length)||(ending>length)){
-					return -1;
-	}
-
-	a = fgetc(events_in);
-	if (a == EOF) {return EOF; }
-	row_freq = get_row_frequency(a);
-	col_freq = get_col_frequency(a);
-	if (row_freq == -1 || col_freq == -1) {
-		return EOF;
-	}
-	fgetc(events_in); // Get rid of \n
-	if (a == EOF){return EOF; }
 
 
 	FILE* opened_file = 0;
@@ -194,11 +159,12 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 			return EOF;
 		}
 	}
+
+
 	for (int i = 0; i < length; i++) {
 		double dtmf = 0;
-		if (i >= ending) {
+		if ((i==0) || (i >= ending)) {
 			starting = 0;
-
 			char a = fgetc(events_in);
 			if (a != EOF) {
 				while(a != '\t') {
@@ -233,25 +199,26 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 
 				a = fgetc(events_in);
 				if (a == EOF) {return EOF; }
-				row_freq = get_row_frequency(a);
-				col_freq = get_col_frequency(a);
+				row_freq = get_frequency(a,0);
+				col_freq = get_frequency(a,1);
 				if (row_freq == -1 || col_freq == -1) {
 					return EOF;
 				}
 
 				fgetc(events_in); // Get rid of \n
-				if (a == EOF) { 
-					return EOF; }
+				if (a == EOF) { return EOF; }
+
+				angular_row_freq = 2.0*M_PI*row_freq/audio_frame_rate;
+				angular_col_freq = 2.0*M_PI*col_freq/audio_frame_rate;
 			}
 		}
 		if (i >= starting && i < ending) {
-			double a = cos((2.0 * pi * row_freq * i) / audio_frame_rate);
-			double b = cos((2.0 * pi * col_freq * i )/ audio_frame_rate);
-			double c = (a * 0.5) + (b * 0.5);
-			dtmf = c * INT16_MAX;
+			double a = cos(angular_row_freq*i)*0.5;
+			double b = cos(angular_col_freq*i)*0.5;
+			//double c = (a * 0.5) + (b * 0.5);
+			dtmf = (a+b) * INT16_MAX;
 		}
 		if (opened_file) {
-			double w = get_w();
 			int16_t i_real;
 			int i = audio_read_sample(opened_file, &i_real);
 			if (i != EOF) {
@@ -265,7 +232,10 @@ int dtmf_generate(FILE *events_in, FILE *audio_out, uint32_t length) {
 		}
 
 		int16_t dtmf_int = dtmf;
-		dtmf_generate_helper(dtmf_int, audio_out);
+		if(audio_write_sample(audio_out, dtmf_int)==EOF){
+			return EOF;
+		}
+		//dtmf_generate_helper(dtmf_int, audio_out);
 	}
 
     return 0;
@@ -340,8 +310,6 @@ int dtmf_detect(FILE *audio_in, FILE *events_out) {
     	int frequency = i_to_freq(i);
     	int N = block_size;
     	double k = frequency / 8000.0 * N;
-    	// printf("%dHz -> %lf\n", frequency, k);
-    	// intializing the state
     	GOERTZEL_STATE* x = (i + goertzel_state);
     	goertzel_init(x, N, k);
     }
@@ -354,26 +322,16 @@ int dtmf_detect(FILE *audio_in, FILE *events_out) {
     		break;
     	}
     	current_block += 1;
-    	// printf("%d\n", dtmf);
     	for (int j = 0; j < 8; j++) {
     		GOERTZEL_STATE* x = (j + goertzel_state);
-    		// if (j == 0) {
-    		// 	printf("%lf\n", x->s0);
-    		// }
     		goertzel_step(x, 1.0 * dtmf / INT16_MAX);
-    		// if (j == 0) {
-    		// 	printf("%lf %lf %lf\n", x->s0, x->s1, x->s2);
-    		// }
     	}
     }
-
-    // final step
     int16_t dtmf;
     int result = audio_read_sample(audio_in, &dtmf);
     if (result == EOF) {
     	break;
     }
-    // printf("%d\n", dtmf);
     current_block += 1;
     for (int j = 0; j < 8; j++) {
     	GOERTZEL_STATE* x = (j + goertzel_state);

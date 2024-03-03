@@ -116,6 +116,7 @@ void generate_dtmf_audio(struct _dtmf_event *events, int nevents, char *audio,
 		int16_t output = INT16_MAX * expected;
 		/* NOTE: make sure to shift endianess! */
 		int16_big2little(&output);
+		//printf("%d\n", output);
 		*sample = output;
 	}
 }
@@ -304,6 +305,8 @@ void validate_dtmf_audio(struct _dtmf_event *events, int nevents, char *audio,
 	 * -> double (converts the -32768~32767 ranged sample back into double)
 	 * will lose some precision
 	 */
+
+	//printf("%d\n",(*(audio+2)));
 	const double my_epsilon = 1e-4;
 	struct _dtmf_event *cur_event = events;
 	double received, expected;
@@ -325,7 +328,6 @@ void validate_dtmf_audio(struct _dtmf_event *events, int nevents, char *audio,
 	     ++sample, offset += sizeof(int16_t), ++i) {
 		/* NOTE: Remember to shift endianess! */
 		int16_big2little(sample);
-
 		/* If sample index exceeds the event's end index,
 		 * try going to the next event */
 		if (i >= cur_event->end_index && e < nevents - 1) {
@@ -364,6 +366,7 @@ void validate_dtmf_audio(struct _dtmf_event *events, int nevents, char *audio,
 		}
 		/* Compare */
 		received = 1.0 * (*sample) / INT16_MAX;
+		//printf("%d\n",*sample);
 		cr_assert(
 		    (fabs(received - expected) < my_epsilon),
 		    "Output audio sample is wrong, expected %.6f, got %.6f, "

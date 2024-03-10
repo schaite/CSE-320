@@ -1,0 +1,414 @@
+Graded Commit:55c83e08d9b693743b150f1c941241ecc4351472
+
+
+--ascii is deprecated. Use LANG/LC_* variables to control encoding, and TERM/--color to control colors.
+[----] Criterion v2.4.1-13-g2f48d0f-dirty (bleeding)
+[====] Running 4 tests from basecode_tests_suite:
+[RUN ] basecode_tests_suite::help_system_test
+USAGE: bin/huff [-h] [-c|-d] [-b BLOCKSIZE]
+    -h       Help: displays this help menu.
+    -c       Compress: read raw data, output compressed data
+    -d       Decompress: read compressed data, output raw data
+    -b       For compression, specify blocksize in bytes (range [1024, 65536])
+
+[PASS] basecode_tests_suite::help_system_test: (0.00s)
+[RUN ] basecode_tests_suite::validargs_compress_test
+[PASS] basecode_tests_suite::validargs_compress_test: (0.00s)
+[RUN ] basecode_tests_suite::validargs_error_test
+[PASS] basecode_tests_suite::validargs_error_test: (0.00s)
+[RUN ] basecode_tests_suite::validargs_help_test
+[PASS] basecode_tests_suite::validargs_help_test: (0.00s)
+[====] Running 11 tests from compress_system_suite:
+[RUN ] compress_system_suite::compress_emoji
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on /dev/fd/63 which is empty
+[----] tests/system_tests.c:151: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] compress_system_suite::compress_emoji: (0.01s)
+[RUN ] compress_system_suite::compress_emoji_ascii
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on /dev/fd/63 which is empty
+[----] tests/system_tests.c:167: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] compress_system_suite::compress_emoji_ascii: (0.01s)
+[RUN ] compress_system_suite::compress_empty
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+[PASS] compress_system_suite::compress_empty: (0.01s)
+[RUN ] compress_system_suite::compress_large
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on /dev/fd/63 which is empty
+[----] tests/system_tests.c:183: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] compress_system_suite::compress_large: (0.01s)
+[RUN ] compress_system_suite::compress_pipe_test
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on /dev/fd/63 which is empty
+[----] tests/system_tests.c:23: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] compress_system_suite::compress_pipe_test: (0.02s)
+[RUN ] compress_system_suite::compress_single_byte
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on /dev/fd/63 which is empty
+[----] tests/system_tests.c:135: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] compress_system_suite::compress_single_byte: (0.01s)
+[RUN ] compress_system_suite::compress_test0
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on /dev/fd/63 which is empty
+[----] tests/system_tests.c:39: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] compress_system_suite::compress_test0: (0.01s)
+[RUN ] compress_system_suite::compress_test1
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on /dev/fd/63 which is empty
+[----] tests/system_tests.c:55: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] compress_system_suite::compress_test1: (0.01s)
+[RUN ] compress_system_suite::compress_test2
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on /dev/fd/63 which is empty
+[----] tests/system_tests.c:71: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] compress_system_suite::compress_test2: (0.01s)
+[RUN ] compress_system_suite::compress_test3
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on /dev/fd/63 which is empty
+[----] tests/system_tests.c:87: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] compress_system_suite::compress_test3: (0.01s)
+[RUN ] compress_system_suite::compress_test4
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on /dev/fd/63 which is empty
+[----] tests/system_tests.c:103: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] compress_system_suite::compress_test4: (0.01s)
+[====] Running 10 tests from compress_test_suite:
+[RUN ] compress_test_suite::compress_block_1024_test
+[FAIL] compress_test_suite::compress_block_1024_test: Timed out. (5.00s)
+[RUN ] compress_test_suite::compress_block_test0
+[FAIL] compress_test_suite::compress_block_test0: Timed out. (5.00s)
+[RUN ] compress_test_suite::compress_block_test1
+[FAIL] compress_test_suite::compress_block_test1: Timed out. (5.00s)
+[RUN ] compress_test_suite::compress_block_test2
+sh: 1: ulimit: error setting limit (Operation not permitted)
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+[PASS] compress_test_suite::compress_block_test2: (0.01s)
+[RUN ] compress_test_suite::compress_block_test3
+[FAIL] compress_test_suite::compress_block_test3: Timed out. (5.00s)
+[RUN ] compress_test_suite::compress_block_test4
+[FAIL] compress_test_suite::compress_block_test4: Timed out. (5.00s)
+[RUN ] compress_test_suite::compress_block_test5
+sh: 1: ulimit: error setting limit (Operation not permitted)
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on /dev/fd/63 which is empty
+[----] tests/compress_tests.c:184: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] compress_test_suite::compress_block_test5: (0.01s)
+[RUN ] compress_test_suite::compress_block_test6
+[FAIL] compress_test_suite::compress_block_test6: Timed out. (5.00s)
+[RUN ] compress_test_suite::compress_block_test7
+[FAIL] compress_test_suite::compress_block_test7: Timed out. (5.00s)
+[RUN ] compress_test_suite::compress_test0
+[FAIL] compress_test_suite::compress_test0: Timed out. (5.00s)
+[====] Running 17 tests from decompress_system_suite:
+[RUN ] decompress_system_suite::decompress_empty
+[PASS] decompress_system_suite::decompress_empty: (0.00s)
+[RUN ] decompress_system_suite::decompress_invalid_num_nodes
+[----] tests/system_tests.c:359: Assertion Failed
+[----]   
+[----]   Invalid return for decompress. Got 0 | Expected: 1
+[----]   
+[FAIL] decompress_system_suite::decompress_invalid_num_nodes: (0.00s)
+[RUN ] decompress_system_suite::decompress_no_end_block
+[----] tests/system_tests.c:318: Assertion Failed
+[----]   
+[----]   Invalid return for decompress. Got 0 | Expected: 1
+[----]   
+[FAIL] decompress_system_suite::decompress_no_end_block: (0.01s)
+[RUN ] decompress_system_suite::decompress_no_end_symbol
+[----] tests/system_tests.c:328: Assertion Failed
+[----]   
+[----]   Invalid return for decompress. Got 0 | Expected: 1
+[----]   
+[FAIL] decompress_system_suite::decompress_no_end_symbol: (0.00s)
+[RUN ] decompress_system_suite::decompress_no_internal_nodes
+[----] tests/system_tests.c:349: Assertion Failed
+[----]   
+[----]   Invalid return for decompress. Got 0 | Expected: 1
+[----]   
+[FAIL] decompress_system_suite::decompress_no_internal_nodes: (0.00s)
+[RUN ] decompress_system_suite::decompress_no_leaf_nodes
+[----] tests/system_tests.c:339: Assertion Failed
+[----]   
+[----]   Invalid return for decompress. Got 0 | Expected: 1
+[----]   
+[FAIL] decompress_system_suite::decompress_no_leaf_nodes: (0.01s)
+[RUN ] decompress_system_suite::decompress_pipe_test
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on ./test_output/decompress_system_suite/decompress_pipe_test.out which is empty
+[----] tests/system_tests.c:202: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] decompress_system_suite::decompress_pipe_test: (0.01s)
+[RUN ] decompress_system_suite::decompress_single_byte
+[----] tests/system_tests.c:400: Assertion Failed
+[----]   
+[----]   Invalid return for decompress. Got 0 | Expected: 1
+[----]   
+[FAIL] decompress_system_suite::decompress_single_byte: (0.00s)
+[RUN ] decompress_system_suite::decompress_test0
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on ./test_output/decompress_system_suite/decompress_test0.out which is empty
+[----] tests/system_tests.c:217: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] decompress_system_suite::decompress_test0: (0.01s)
+[RUN ] decompress_system_suite::decompress_test1
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on ./test_output/decompress_system_suite/decompress_test1.out which is empty
+[----] tests/system_tests.c:232: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] decompress_system_suite::decompress_test1: (0.01s)
+[RUN ] decompress_system_suite::decompress_test2
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on ./test_output/decompress_system_suite/decompress_test2.out which is empty
+[----] tests/system_tests.c:248: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] decompress_system_suite::decompress_test2: (0.01s)
+[RUN ] decompress_system_suite::decompress_test3
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on ./test_output/decompress_system_suite/decompress_test3.out which is empty
+[----] tests/system_tests.c:263: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] decompress_system_suite::decompress_test3: (0.01s)
+[RUN ] decompress_system_suite::decompress_test4
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on ./test_output/decompress_system_suite/decompress_test4.out which is empty
+[----] tests/system_tests.c:278: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] decompress_system_suite::decompress_test4: (0.01s)
+[RUN ] decompress_system_suite::decompress_test5
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on ./test_output/decompress_system_suite/decompress_test5.out which is empty
+[----] tests/system_tests.c:293: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] decompress_system_suite::decompress_test5: (0.01s)
+[RUN ] decompress_system_suite::decompress_test6
+[1;35mDEBUG: src/main.c:main:24 [0mOptions: 0xffff0004
+cmp: EOF on ./test_output/decompress_system_suite/decompress_test6.out which is empty
+[----] tests/system_tests.c:308: Assertion Failed
+[----]   
+[----]   The output when decompressed is not equivalent to the original file. Got 1 | Expected: 0
+[----]   
+[FAIL] decompress_system_suite::decompress_test6: (0.01s)
+[RUN ] decompress_system_suite::decompress_trunc_at_symbols
+[----] tests/system_tests.c:411: Assertion Failed
+[----]   
+[----]   Invalid return for decompress. Got 0 | Expected: 1
+[----]   
+[FAIL] decompress_system_suite::decompress_trunc_at_symbols: (0.00s)
+[RUN ] decompress_system_suite::decompress_trunc_at_traversal
+[----] tests/system_tests.c:380: Assertion Failed
+[----]   
+[----]   Invalid return for decompress. Got 0 | Expected: 1
+[----]   
+[FAIL] decompress_system_suite::decompress_trunc_at_traversal: (0.00s)
+[====] Running 18 tests from decompress_test_suite:
+[RUN ] decompress_test_suite::decompress_block_empty
+[----] tests/decompress_tests.c:288: Assertion Failed
+[----]   
+[----]   Invalid return for decompress block. Got 0 | Expected: -1
+[----]   
+[FAIL] decompress_test_suite::decompress_block_empty: (0.00s)
+[RUN ] decompress_test_suite::decompress_block_invalid_num_nodes
+[----] tests/decompress_tests.c:229: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_invalid_num_nodes: CRASH!
+[RUN ] decompress_test_suite::decompress_block_no_end_block
+[----] tests/decompress_tests.c:177: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_no_end_block: CRASH!
+[RUN ] decompress_test_suite::decompress_block_no_end_symbol
+[----] tests/decompress_tests.c:190: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_no_end_symbol: CRASH!
+[RUN ] decompress_test_suite::decompress_block_no_internal_nodes
+[----] tests/decompress_tests.c:216: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_no_internal_nodes: CRASH!
+[RUN ] decompress_test_suite::decompress_block_no_leaf_nodes
+[----] tests/decompress_tests.c:203: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_no_leaf_nodes: CRASH!
+[RUN ] decompress_test_suite::decompress_block_single_byte
+[----] tests/decompress_tests.c:301: Assertion Failed
+[----]   
+[----]   Invalid return for decompress block. Got 0 | Expected: -1
+[----]   
+[FAIL] decompress_test_suite::decompress_block_single_byte: (0.00s)
+[RUN ] decompress_test_suite::decompress_block_test0
+[----] tests/decompress_tests.c:38: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_test0: CRASH!
+[RUN ] decompress_test_suite::decompress_block_test1
+[----] tests/decompress_tests.c:58: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_test1: CRASH!
+[RUN ] decompress_test_suite::decompress_block_test2
+[----] tests/decompress_tests.c:78: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_test2: CRASH!
+[RUN ] decompress_test_suite::decompress_block_test3
+[----] tests/decompress_tests.c:98: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_test3: CRASH!
+[RUN ] decompress_test_suite::decompress_block_test4
+[----] tests/decompress_tests.c:118: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_test4: CRASH!
+[RUN ] decompress_test_suite::decompress_block_test5
+[----] tests/decompress_tests.c:137: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_test5: CRASH!
+[RUN ] decompress_test_suite::decompress_block_test6
+[----] tests/decompress_tests.c:157: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_test6: CRASH!
+[RUN ] decompress_test_suite::decompress_block_trunc_at_symbols
+[----] tests/decompress_tests.c:305: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_block_trunc_at_symbols: CRASH!
+[RUN ] decompress_test_suite::decompress_block_trunc_at_traversal
+[----] tests/decompress_tests.c:275: Assertion Failed
+[----]   
+[----]   Invalid return for decompress block. Got 0 | Expected: -1
+[----]   
+[FAIL] decompress_test_suite::decompress_block_trunc_at_traversal: (0.00s)
+[RUN ] decompress_test_suite::decompress_test0
+[----] tests/decompress_tests.c:16: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_test0: CRASH!
+[RUN ] decompress_test_suite::decompress_test1
+[----] tests/decompress_tests.c:25: Unexpected signal caught below this line!
+[FAIL] decompress_test_suite::decompress_test1: CRASH!
+[====] Running 4 tests from emit_huffman_tree_suite:
+[RUN ] emit_huffman_tree_suite::emit_huffman_tree_test0
+NUM OF SYMBOLS:	257
+[PASS] emit_huffman_tree_suite::emit_huffman_tree_test0: (0.00s)
+[RUN ] emit_huffman_tree_suite::emit_huffman_tree_test1
+NUM OF SYMBOLS:	2
+[PASS] emit_huffman_tree_suite::emit_huffman_tree_test1: (0.00s)
+[RUN ] emit_huffman_tree_suite::emit_huffman_tree_test2
+NUM OF SYMBOLS:	257
+[PASS] emit_huffman_tree_suite::emit_huffman_tree_test2: (0.00s)
+[RUN ] emit_huffman_tree_suite::emit_huffman_tree_test3
+NUM OF SYMBOLS:	257
+[PASS] emit_huffman_tree_suite::emit_huffman_tree_test3: (0.00s)
+[====] Running 8 tests from read_huffman_tree_suite:
+[RUN ] read_huffman_tree_suite::read_huff_tree_empty
+[----] tests/decompress_tests.c:357: Assertion Failed
+[----]   
+[----]   Invalid return for read huffman tree. Got -1 | Expected: 1
+[----]   
+[FAIL] read_huffman_tree_suite::read_huff_tree_empty: (0.00s)
+[RUN ] read_huffman_tree_suite::read_huff_tree_no_leaf_nodes
+[PASS] read_huffman_tree_suite::read_huff_tree_no_leaf_nodes: (0.00s)
+[RUN ] read_huffman_tree_suite::read_huff_tree_single_byte
+[PASS] read_huffman_tree_suite::read_huff_tree_single_byte: (0.00s)
+[RUN ] read_huffman_tree_suite::read_huff_tree_test0
+[----] tests/decompress_tests.c:387: Unexpected signal caught below this line!
+[FAIL] read_huffman_tree_suite::read_huff_tree_test0: CRASH!
+[RUN ] read_huffman_tree_suite::read_huff_tree_test1
+[----] tests/decompress_tests.c:458: Assertion Failed
+[----]   
+[----]   Incorrect number of nodes in tree. Got 3 | Expected: 1
+[----]   
+[FAIL] read_huffman_tree_suite::read_huff_tree_test1: (0.00s)
+[RUN ] read_huffman_tree_suite::read_huff_tree_test2
+[----] tests/decompress_tests.c:465: Unexpected signal caught below this line!
+[FAIL] read_huffman_tree_suite::read_huff_tree_test2: CRASH!
+[RUN ] read_huffman_tree_suite::read_huff_tree_trunc_at_symbols
+[PASS] read_huffman_tree_suite::read_huff_tree_trunc_at_symbols: (0.00s)
+[RUN ] read_huffman_tree_suite::read_huff_tree_trunc_at_traversal
+[PASS] read_huffman_tree_suite::read_huff_tree_trunc_at_traversal: (0.00s)
+[====] Running 17 tests from validargs_test_suite:
+[RUN ] validargs_test_suite::validargs_compress_invalid_block_test0
+[PASS] validargs_test_suite::validargs_compress_invalid_block_test0: (0.00s)
+[RUN ] validargs_test_suite::validargs_compress_invalid_block_test1
+[PASS] validargs_test_suite::validargs_compress_invalid_block_test1: (0.00s)
+[RUN ] validargs_test_suite::validargs_compress_test0
+[PASS] validargs_test_suite::validargs_compress_test0: (0.00s)
+[RUN ] validargs_test_suite::validargs_compress_test1
+[PASS] validargs_test_suite::validargs_compress_test1: (0.00s)
+[RUN ] validargs_test_suite::validargs_compress_test2
+[PASS] validargs_test_suite::validargs_compress_test2: (0.00s)
+[RUN ] validargs_test_suite::validargs_decompress_test
+[PASS] validargs_test_suite::validargs_decompress_test: (0.00s)
+[RUN ] validargs_test_suite::validargs_default_compress_test
+[PASS] validargs_test_suite::validargs_default_compress_test: (0.00s)
+[RUN ] validargs_test_suite::validargs_help_test0
+[PASS] validargs_test_suite::validargs_help_test0: (0.00s)
+[RUN ] validargs_test_suite::validargs_help_test1
+[PASS] validargs_test_suite::validargs_help_test1: (0.00s)
+[RUN ] validargs_test_suite::validargs_help_test2
+[PASS] validargs_test_suite::validargs_help_test2: (0.00s)
+[RUN ] validargs_test_suite::validargs_help_test3
+[PASS] validargs_test_suite::validargs_help_test3: (0.00s)
+[RUN ] validargs_test_suite::validargs_invalid_combination_test0
+[----] tests/validargs_tests/validargs_tests.c:189: Assertion Failed
+[----]   
+[----]   Invalid return for valid args. Got 0 | Expected: -1
+[----]   
+[FAIL] validargs_test_suite::validargs_invalid_combination_test0: (0.00s)
+[RUN ] validargs_test_suite::validargs_invalid_compress_test
+[----] tests/validargs_tests/validargs_tests.c:116: Assertion Failed
+[----]   
+[----]   Invalid return for valid args. Got 0 | Expected: -1
+[----]   
+[FAIL] validargs_test_suite::validargs_invalid_compress_test: (0.00s)
+[RUN ] validargs_test_suite::validargs_invalid_order_test
+[----] tests/validargs_tests/validargs_tests.c:162: Assertion Failed
+[----]   
+[----]   Invalid return for valid args. Got 0 | Expected: -1
+[----]   
+[FAIL] validargs_test_suite::validargs_invalid_order_test: (0.00s)
+[RUN ] validargs_test_suite::validargs_invalid_test0
+[PASS] validargs_test_suite::validargs_invalid_test0: (0.00s)
+[RUN ] validargs_test_suite::validargs_invalid_test1
+[PASS] validargs_test_suite::validargs_invalid_test1: (0.00s)
+[RUN ] validargs_test_suite::validargs_invalid_test2
+[----] tests/validargs_tests/validargs_tests.c:296: Assertion Failed
+[----]   
+[----]   Invalid return for valid args. Got 0 | Expected: -1
+[----]   
+[----] tests/validargs_tests/validargs_tests.c:301: Assertion Failed
+[----]   
+[----]   Invalid return for valid args. Got 0 | Expected: -1
+[----]   
+[----] tests/validargs_tests/validargs_tests.c:306: Assertion Failed
+[----]   
+[----]   Invalid return for valid args. Got 0 | Expected: -1
+[----]   
+[FAIL] validargs_test_suite::validargs_invalid_test2: (0.00s)
+[----] Writing xml report in `crit.xml`.
+[====] Synthesis: Tested: 89 | Passing: 28 | Failing: 61 | Crashing: 17 

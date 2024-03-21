@@ -40,21 +40,8 @@ void *sf_malloc(size_t size) {
         //add a page
     }*/
     //Allocate the block found 
-    //check if the block can be splitted. if so, split the block 
-    if(GET_SIZE(block_to_allocate->header)<(allocate+MIN_BLOCK_SIZE)){//no need to split
-        //update allocated block header
-        block_to_allocate->header = PACK(GET_SIZE(block_to_allocate->header),GET_PREV_BLOCK_ALLOCATED(block_to_allocate->header),THIS_BLOCK_ALLOCATED,0);
-        //check if next block is allocated or free
-        //if allocated update prev_alloc to 1, else update both header and footer of the block
-
-    }
-    else{//split the block, insert upper part of the splitted block in the main free list, then allocate the lower part
-        
-    }
-
-
-
-    abort();
+    return allocate_free_block(allocate,block_to_allocate);
+    //abort();
 }
 
 void sf_free(void *pp) {

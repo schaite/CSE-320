@@ -2,6 +2,7 @@
 #define SFMM_HELPER_H
 
 #include "sfmm.h"
+#include <errno.h>
 
 #define WSIZE ((size_t)2)
 #define  MEM_ROW ((size_t)8)
@@ -25,6 +26,8 @@ void init_qklst();
 size_t size_to_allocate(size_t size);
 sf_block*  search_qklst(size_t size);
 sf_block* search_free_list_heads(size_t size);
+sf_block* allocate_free_block(size_t size, sf_block* block_to_allocate);
+sf_block* split_to_allocate(size_t size, sf_block* free_block);
 
 
 #endif

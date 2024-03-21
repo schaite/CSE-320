@@ -2,6 +2,7 @@
 
 void initialize_heap(){
     if(sf_mem_grow()==NULL){//grow the heap by one page 
+        sf_errno = ENOMEM;
         return;
     }
 
@@ -22,6 +23,8 @@ void initialize_heap(){
     sf_block* first_free_block = (sf_block*) (heap_start+MIN_BLOCK_SIZE);
     size_t first_free_block_size = PAGE_SZ-MEM_ROW-MIN_BLOCK_SIZE-MEM_ROW; //page_size - alignment_row - prologue_size - epilogue_size;
     first_free_block->header = PACK(first_free_block_size,PREV_BLOCK_ALLOCATED,0,0);
+    sf_footer* first_block_footer = (sf_footer*)((void*)first_free_block+first_free_block_size-sizeof(sf_footer));
+    *first_block_footer = first_free_block->header;//footer of the first block 
     insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(first_free_block_size)],first_free_block);
     //initialize quicklist
     init_qklst();
@@ -110,6 +113,7 @@ sf_block* search_qklst(size_t size){
     sf_quick_lists[(size-MIN_BLOCK_SIZE)/ALIGN_SIZE].length--;
     //clear dangling pointers 
     block->body.links.next = NULL;
+    block->header &= (~IN_QUICK_LIST);//clear in_qklst bit 
     return block;
 }
 
@@ -133,4 +137,45 @@ sf_block* search_free_list_heads(size_t size){
     return NULL;
 }
 
+sf_block* allocate_free_block(size_t size, sf_block* block_to_allocate){
+    //split or not??
+    if(GET_SIZE(block_to_allocate->header)<(size+MIN_BLOCK_SIZE)){//no need to split
+        //update allocated block header
+        block_to_allocate->header |= THIS_BLOCK_ALLOCATED;
+        sf_block* next_block = (sf_block*)(((void*)block_to_allocate)+GET_SIZE(block_to_allocate->header));
+        next_block->header |= PREV_BLOCK_ALLOCATED;
+        return block_to_allocate;
+    }
+    else{//split the block, insert upper part of the splitted block in the main free list, then allocate the lower part
+        return split_to_allocate(size,block_to_allocate);
+    }
+    return NULL;
+}
 
+sf_block* split_to_allocate(size_t size, sf_block* free_block){
+    //update the following block of free_block with PREV_BLOCK_ALLOCATED
+    sf_block* next_block = (sf_block*)(((void*)free_block)+GET_SIZE(free_block->header));
+    next_block->header |= PREV_BLOCK_ALLOCATED;
+
+    //configer the higher block as new free block: 
+
+    //1. set the remaining size as new_block_size
+    size_t new_free_block_size = GET_SIZE(free_block->header)-size;
+    //2. update header for the new free block
+    free_block->header = PACK(new_free_block_size,GET_PREV_BLOCK_ALLOCATED(free_block->header),0,0);
+    //3. create new footer for the new free block 
+    sf_footer* new_free_block_footer = (sf_footer*)((void*)free_block+new_free_block_size-sizeof(sf_footer));
+    *new_free_block_footer = free_block->header;
+
+    //create the new block to be allocated:
+
+    //1. set allocated block pointer where free block ends
+    sf_block* allocated_block = (sf_block*)((void*)free_block+new_free_block_size);
+    //2. set header size, and bits
+    allocated_block->header = PACK(size,0,1,0);
+
+    //insert the new_free_block in free_list_heads
+    insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(new_free_block_size)],free_block);
+
+    return allocated_block;
+}

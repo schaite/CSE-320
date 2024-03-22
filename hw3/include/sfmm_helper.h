@@ -18,16 +18,19 @@
 #define GET_THIS_BLOCK_ALLOCATED(header) (((header)^(MAGIC))&(THIS_BLOCK_ALLOCATED))
 #define GET_IN_QUICK_LIST(header) (((header)^(MAGIC))&(PREV_BLOCK_ALLOCATED))
 
-void initialize_heap();
+
+int initialize_heap();
 void init_free_list_heads();
 int get_free_list_index(size_t size);
 void insert_into_free_list_heads(sf_block* sentinel, sf_block* newBlock);
+void insert_into_quick_list(sf_block* free_block,size_t size);
 void init_qklst();
 size_t size_to_allocate(size_t size);
 sf_block*  search_qklst(size_t size);
 sf_block* search_free_list_heads(size_t size);
 sf_block* allocate_free_block(size_t size, sf_block* block_to_allocate);
 sf_block* split_to_allocate(size_t size, sf_block* free_block);
+void is_valid_pointer(void *pp);
 
 
 #endif

@@ -10,14 +10,15 @@
 #include "sfmm_helper.h"
 
 void *sf_malloc(size_t size) {
-    // To be implemented.
     //for size zero, no need for allocation. So send a null pointer
     if(size==0){
         return NULL;
     }
     //first call to malloc--> heap is empty. Initailie with prologue, epilogue and first free block
     if(sf_mem_start()==sf_mem_end()){
-        initialize_heap();
+        if(initialize_heap()==-1){
+            return NULL;
+        }
     }
     //calculate the size to allocate
     size_t allocate = size_to_allocate(size);
@@ -40,13 +41,27 @@ void *sf_malloc(size_t size) {
         //add a page
     }*/
     //Allocate the block found 
-    return allocate_free_block(allocate,block_to_allocate);
-    //abort();
+    return &allocate_free_block(allocate,block_to_allocate)->body.payload;
 }
 
 void sf_free(void *pp) {
-    // To be implemented.
-    abort();
+    //check if pointer is valid, if not, program is aborted
+    is_valid_pointer(pp);
+    //check block size and decide is free list is to be added in quicklist or free_list_heads
+    sf_block* free_block = (sf_block*)((char*)pp-sizeof(sf_header));
+    size_t size = GET_SIZE(free_block->header);
+    if(size<=172){//add it to quicklist
+        insert_into_quick_list(free_block,size);
+    }
+    else{//add it to free_list_heads
+
+    }
+    //if quicklist consider 2 situtation: 1. list for that size has capacity, 2. doesn't have capacity. 
+    //for, 1: simply insert it in quicklist 
+    //for 2: need to flush that list which contains coalescing 
+    //for large blocks, add it to free_list_heads and coalesce
+
+    //abort();
 }
 
 void *sf_realloc(void *pp, size_t rsize) {

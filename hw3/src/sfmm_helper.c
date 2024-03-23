@@ -11,10 +11,9 @@ int initialize_heap(){
     //initialize prologue block
     sf_block* prologue = (sf_block*)((void*)sf_mem_start());
     prologue->header = PACK(MIN_BLOCK_SIZE,PREV_BLOCK_ALLOCATED,THIS_BLOCK_ALLOCATED,0);
-
+    //initialize Epilogue block
     sf_block* epilogue = (sf_block*)((void*)sf_mem_start()+PAGE_SZ-16);
     epilogue->header = PACK(0,PREV_BLOCK_ALLOCATED,THIS_BLOCK_ALLOCATED,0);
-
     //initialize the free_list_heads array with sentinels
     init_free_list_heads();
     //initialize the first block
@@ -22,7 +21,6 @@ int initialize_heap(){
     size_t first_free_block_size = PAGE_SZ-MEM_ROW-MIN_BLOCK_SIZE-MEM_ROW; //page_size - alignment_row - prologue_size - epilogue_size;
     first_free_block->header = PACK(first_free_block_size,PREV_BLOCK_ALLOCATED,0,0);
     sf_footer* first_block_footer = (sf_footer*)((void*)first_free_block+first_free_block_size);
-    //printf("%lx\n",(uintptr_t)((void*)first_free_block+first_free_block_size));
     *first_block_footer = first_free_block->header;//footer of the first block 
     insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(first_free_block_size)],first_free_block);
     //initialize quicklist
@@ -95,6 +93,7 @@ void insert_into_quick_list(sf_block* free_block, size_t size){
     if(sf_quick_lists[qklst_index].length<5){//No overflow, enter the block in front of the list
         //Set alloc and in_qklist block to 1 
         free_block->header = PACK(size,GET_PREV_BLOCK_ALLOCATED(free_block->header),THIS_BLOCK_ALLOCATED,IN_QUICK_LIST);
+        printf("%lu\n",(free_block->header^MAGIC));
         //Insert free_block in the quicklist
         free_block->body.links.next = sf_quick_lists[qklst_index].first;
         sf_quick_lists[qklst_index].first = free_block;
@@ -109,15 +108,15 @@ void insert_into_quick_list(sf_block* free_block, size_t size){
 }
 
 size_t size_to_allocate(size_t size){
-    if(size<=MIN_BLOCK_SIZE){
+    if((size+sizeof(sf_header)<=MIN_BLOCK_SIZE)){
         return MIN_BLOCK_SIZE;
     }
     else{
-        if(size%ALIGN_SIZE==0){
-            return size;
+        if((size+sizeof(sf_header))%ALIGN_SIZE==0){
+            return size+sizeof(sf_header);
         }
         else{
-            return size+(size%ALIGN_SIZE);
+            return size+sizeof(sf_header)+((size+sizeof(sf_header))%ALIGN_SIZE);
         }
     }
 }
@@ -180,7 +179,7 @@ sf_block* split_to_allocate(size_t size, sf_block* free_block){
     //2. update header for the new free block
     free_block->header = PACK(new_free_block_size,GET_PREV_BLOCK_ALLOCATED(free_block->header),0,0);
     //3. create new footer for the new free block 
-    sf_footer* new_free_block_footer = (sf_footer*)((char*)free_block+new_free_block_size-sizeof(sf_footer));
+    sf_footer* new_free_block_footer = (sf_footer*)((char*)free_block+new_free_block_size);
     *new_free_block_footer = free_block->header;
 
     //create the new block to be allocated:
@@ -188,7 +187,7 @@ sf_block* split_to_allocate(size_t size, sf_block* free_block){
     //1. set allocated block pointer where free block ends
     sf_block* allocated_block = (sf_block*)((char*)free_block+new_free_block_size);
     //2. set header size, and bits
-    allocated_block->header = PACK(size,0,1,0);
+    allocated_block->header = PACK(size,0,THIS_BLOCK_ALLOCATED,0);
 
     //update the following block of free_block with PREV_BLOCK_ALLOCATED[did it in the beginning, as i'm gonna lose the pointer]
     sf_block* next_block = (sf_block*)(((char*)allocated_block)+size);
@@ -206,7 +205,7 @@ void is_valid_pointer(void *pp){
         abort();
     }
     //get pointer to the starting of the block
-    sf_block *ptr = (sf_block*)((char*)pp-sizeof(sf_header));
+    sf_block *ptr = (sf_block*)((char*)pp-sizeof(sf_header)-sizeof(sf_footer));
     sf_header ptr_header = ptr->header^MAGIC;
     size_t size = GET_SIZE(ptr->header);
 
@@ -216,9 +215,9 @@ void is_valid_pointer(void *pp){
     }
     //Header of the block is before the start of the first block of the heap 
     //or, Footer of the block is after the end of the last block of the heap
-    void* first_block_start = sf_mem_start()+MIN_BLOCK_SIZE;
+    void* first_block_start = sf_mem_start()+MIN_BLOCK_SIZE+MEM_ROW;
     void* last_block_end = sf_mem_end()-MEM_ROW;//start of epilogue
-    if((char*)ptr<(char*)first_block_start||(char*)ptr+size>=(char*)last_block_end){
+    if(((char*)ptr+MEM_ROW)<(char*)first_block_start||(char*)ptr+size>=(char*)last_block_end){
         abort();
     }
     //alloc bit is 0 or in_qklst bit is 1

@@ -48,7 +48,7 @@ void sf_free(void *pp) {
     //check if pointer is valid, if not, program is aborted
     is_valid_pointer(pp);
     //check block size and decide is free list is to be added in quicklist or free_list_heads
-    sf_block* free_block = (sf_block*)((char*)pp-sizeof(sf_header));
+    sf_block* free_block = (sf_block*)((char*)pp-sizeof(sf_header)-sizeof(sf_footer));
     size_t size = GET_SIZE(free_block->header);
     if(size<=172){//add it to quicklist
         insert_into_quick_list(free_block,size);

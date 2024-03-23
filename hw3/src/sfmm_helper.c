@@ -93,7 +93,7 @@ void insert_into_quick_list(sf_block* free_block, size_t size){
     if(sf_quick_lists[qklst_index].length<5){//No overflow, enter the block in front of the list
         //Set alloc and in_qklist block to 1 
         free_block->header = PACK(size,GET_PREV_BLOCK_ALLOCATED(free_block->header),THIS_BLOCK_ALLOCATED,IN_QUICK_LIST);
-        printf("%lu\n",(free_block->header^MAGIC));
+        //printf("%lu\n",(free_block->header^MAGIC));
         //Insert free_block in the quicklist
         free_block->body.links.next = sf_quick_lists[qklst_index].first;
         sf_quick_lists[qklst_index].first = free_block;
@@ -116,7 +116,7 @@ size_t size_to_allocate(size_t size){
             return size+sizeof(sf_header);
         }
         else{
-            return size+sizeof(sf_header)+((size+sizeof(sf_header))%ALIGN_SIZE);
+            return size+sizeof(sf_header)+(ALIGN_SIZE-(size+sizeof(sf_header))%ALIGN_SIZE);
         }
     }
 }
@@ -158,13 +158,13 @@ sf_block* allocate_free_block(size_t size, sf_block* block_to_allocate){
     //split or not??
     if(GET_SIZE(block_to_allocate->header)<(size+MIN_BLOCK_SIZE)){//no need to split
         //update allocated block header
-        block_to_allocate->header |= THIS_BLOCK_ALLOCATED;
+        block_to_allocate->header = (((block_to_allocate->header)^MAGIC)|THIS_BLOCK_ALLOCATED)^MAGIC;
         //remove allocated block from free list
         block_to_allocate->body.links.prev->body.links.next = block_to_allocate->body.links.next;
         block_to_allocate->body.links.next->body.links.prev = block_to_allocate->body.links.prev;
         //update then next block's header on prev block's allocation
         sf_block* next_block = (sf_block*)(((char*)block_to_allocate)+GET_SIZE(block_to_allocate->header));
-        next_block->header |= PREV_BLOCK_ALLOCATED;
+        next_block->header = (((next_block->header)^MAGIC)|PREV_BLOCK_ALLOCATED)^MAGIC;
         return block_to_allocate;
     }
     else{//split the block, insert upper part of the splitted block in the main free list, then allocate the lower part
@@ -191,7 +191,7 @@ sf_block* split_to_allocate(size_t size, sf_block* free_block){
 
     //update the following block of free_block with PREV_BLOCK_ALLOCATED[did it in the beginning, as i'm gonna lose the pointer]
     sf_block* next_block = (sf_block*)(((char*)allocated_block)+size);
-    next_block->header |= PREV_BLOCK_ALLOCATED;
+    next_block->header = ((next_block->header^MAGIC)|PREV_BLOCK_ALLOCATED)^MAGIC;
 
     //insert the new_free_block in free_list_heads
     insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(new_free_block_size)],free_block);
@@ -230,6 +230,54 @@ void is_valid_pointer(void *pp){
     }
 }
 
+void *coalesce(void *bp){
+    sf_block* free_block = (sf_block*)((void*)bp);
+    size_t size = GET_SIZE(free_block->header);
+    size_t prev_alloc = GET_PREV_BLOCK_ALLOCATED(free_block->header);
+    sf_block* next_block = (sf_block*)((void*)free_block+GET_SIZE(free_block->header));
+    //sf_show_block(next_block);
+    size_t next_alloc = GET_THIS_BLOCK_ALLOCATED(next_block->header);
+
+    //case 1: both Previous and next block is allocated, no coalescing needed. 
+    if(prev_alloc&&next_alloc){
+        return free_block;
+    }
+    //case 2: previous block is allocated but next block is free
+    else if(prev_alloc&&!next_alloc){
+        //extend the size of the free block by adding the size 
+        size_t new_size = size+GET_SIZE(next_block->header);
+        free_block->header=PACK(new_size,PREV_BLOCK_ALLOCATED,0,0);
+        next_block->body.links.next->body.links.prev = free_block;
+        free_block->body.links.next = next_block->body.links.next;
+        sf_footer* free_block_footer = (sf_footer*)((void*)free_block+new_size);
+        *free_block_footer = free_block->header;
+        return free_block;
+    }
+    //case 3: previous is free but next is allocated
+    else if(!prev_alloc&&next_alloc){
+        size_t prev_block_size = GET_SIZE(free_block->prev_footer);
+        sf_block* prev_block = (sf_block*)((void*)free_block-prev_block_size+sizeof(sf_footer));
+        size_t new_size = prev_block_size+size;
+        prev_block->header = PACK(new_size,GET_PREV_BLOCK_ALLOCATED(prev_block->header),0,0);
+        free_block->body.links.next->body.links.prev = prev_block;
+        prev_block->body.links.next = free_block->body.links.next;
+        sf_footer* prev_block_footer = (sf_footer*)((void*)prev_block+new_size);
+        *prev_block_footer = prev_block->header;
+        return prev_block;
+    }
+    else{
+        size_t prev_block_size = GET_SIZE(free_block->prev_footer);
+        sf_block* prev_block = (sf_block*)((void*)free_block-prev_block_size+sizeof(sf_footer));
+        size_t new_size = prev_block_size+size+GET_SIZE(next_block->header);
+        prev_block->header = PACK(new_size,GET_PREV_BLOCK_ALLOCATED(prev_block->header),0,0);
+        next_block->body.links.next->body.links.prev = prev_block;
+        prev_block->body.links.next = next_block->body.links.next;
+        sf_footer* prev_block_footer = (sf_footer*)((void*)prev_block+new_size);
+        *prev_block_footer = prev_block->header;
+        return prev_block;
+    }
+}
 // void flush_quick_list(sf_block* first_block){
 
 // }
+

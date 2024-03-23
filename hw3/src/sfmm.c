@@ -37,9 +37,30 @@ void *sf_malloc(size_t size) {
     If block_to_allocate is still null, means the heap doesn't have enough memory to allocate. 
     So we have add a page to the heap
     */
-    /*if(block_to_allocate==NULL){
-        //add a page
-    }*/
+    // if(block_to_allocate==NULL){
+    //     //add memory of pages to allocate
+    //     int num_pages = 0;
+    //     if(allocate%PAGE_SZ==0){
+    //         num_pages = allocate/PAGE_SZ;
+    //     }
+    //     else{
+    //         num_pages = (int)(allocate/PAGE_SZ)+1;
+    //     }
+    //     for(int i = 0; i<num_pages;i++){
+    //         if(sf_mem_grow()==NULL){//no memory left to extend heap
+    //             sf_errno = ENOMEM;
+    //             return NULL;
+    //         }
+    //         else{
+    //             sf_block* new_block = (sf_block*)((void*)epilogue-MEM_ROW);
+    //             new_block->header = PACK(PAGE_SZ,GET_PREV_BLOCK_ALLOCATED(epilogue->header),0,1);
+    //             epilogue = (sf_block*)((void*)sf_mem_end()-16);
+    //             epilogue->header = PACK(0,0,THIS_BLOCK_ALLOCATED,0);
+    //             coalesce(new_block);
+    //         }
+    //     }
+
+    // }
     //Allocate the block found 
     return &allocate_free_block(allocate,block_to_allocate)->body.payload;
 }
@@ -54,7 +75,23 @@ void sf_free(void *pp) {
         insert_into_quick_list(free_block,size);
     }
     else{//add it to free_list_heads
-
+        //to free a block, update the header of the current block
+        //have the new header point to the footer with the header info
+        //update the next block with prev_block_allocated set to 0
+        free_block->header = PACK(size,GET_PREV_BLOCK_ALLOCATED(free_block->header),0,0);
+        sf_footer* free_block_footer = (sf_footer*)((void*)free_block+size);
+        *free_block_footer = free_block->header;
+        sf_block* next_block = (sf_block*)((void*)free_block+size);
+        //sf_show_block(next_block);
+        //printf("\n");
+        next_block->header = (((next_block->header)^MAGIC)&(~PREV_BLOCK_ALLOCATED))^MAGIC;
+        //sf_show_heap();
+        insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(size)],free_block);
+        //printf("\n");
+        //sf_show_block(free_block);
+        //printf("\n");
+        free_block = (sf_block*)((void*)coalesce(free_block)); 
+        
     }
     //if quicklist consider 2 situtation: 1. list for that size has capacity, 2. doesn't have capacity. 
     //for, 1: simply insert it in quicklist 

@@ -82,15 +82,9 @@ void sf_free(void *pp) {
         sf_footer* free_block_footer = (sf_footer*)((void*)free_block+size);
         *free_block_footer = free_block->header;
         sf_block* next_block = (sf_block*)((void*)free_block+size);
-        //sf_show_block(next_block);
-        //printf("\n");
         next_block->header = (((next_block->header)^MAGIC)&(~PREV_BLOCK_ALLOCATED))^MAGIC;
-        //sf_show_heap();
         insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(size)],free_block);
-        //printf("\n");
-        //sf_show_block(free_block);
-        //printf("\n");
-        free_block = (sf_block*)((void*)coalesce(free_block)); 
+        coalesce(free_block); 
         
     }
     //if quicklist consider 2 situtation: 1. list for that size has capacity, 2. doesn't have capacity. 

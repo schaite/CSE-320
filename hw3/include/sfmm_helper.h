@@ -31,7 +31,7 @@ sf_block* search_free_list_heads(size_t size);
 sf_block* allocate_free_block(size_t size, sf_block* block_to_allocate);
 sf_block* split_to_allocate(size_t size, sf_block* free_block);
 void is_valid_pointer(void *pp);
-void *coalesce(void *bp);
+void *coalesce(sf_block* block);
 
 
 #endif

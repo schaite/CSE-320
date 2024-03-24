@@ -230,53 +230,86 @@ void is_valid_pointer(void *pp){
     }
 }
 
-void *coalesce(void *bp){
-    sf_block* free_block = (sf_block*)((void*)bp);
-    size_t size = GET_SIZE(free_block->header);
-    size_t prev_alloc = GET_PREV_BLOCK_ALLOCATED(free_block->header);
-    sf_block* next_block = (sf_block*)((void*)free_block+GET_SIZE(free_block->header));
-    //sf_show_block(next_block);
-    size_t next_alloc = GET_THIS_BLOCK_ALLOCATED(next_block->header);
+void remove_from_free_list(sf_block* block){
+    if(block->body.links.next==NULL||block->body.links.prev==NULL){
+        return;
+    }
+    block->body.links.prev->body.links.next = block->body.links.next;
+    block->body.links.next->body.links.prev=block->body.links.prev;
+    block->body.links.next=NULL;
+    block->body.links.prev=NULL;
+}
 
-    //case 1: both Previous and next block is allocated, no coalescing needed. 
+void *coalesce(sf_block* block){
+    size_t size = GET_SIZE(block->header);
+    size_t prev_alloc = GET_PREV_BLOCK_ALLOCATED(block->header);
+    sf_block* next_block = (sf_block*)((void*)block+size);
+    size_t next_alloc = GET_THIS_BLOCK_ALLOCATED(next_block->header);
     if(prev_alloc&&next_alloc){
-        return free_block;
+        return block;
     }
-    //case 2: previous block is allocated but next block is free
     else if(prev_alloc&&!next_alloc){
-        //extend the size of the free block by adding the size 
-        size_t new_size = size+GET_SIZE(next_block->header);
-        free_block->header=PACK(new_size,PREV_BLOCK_ALLOCATED,0,0);
-        next_block->body.links.next->body.links.prev = free_block;
-        free_block->body.links.next = next_block->body.links.next;
-        sf_footer* free_block_footer = (sf_footer*)((void*)free_block+new_size);
-        *free_block_footer = free_block->header;
-        return free_block;
+        sf_block* new_block = block;
+        size+=GET_SIZE(next_block->header);
+        sf_header new_header = PACK(size,PREV_BLOCK_ALLOCATED,0,0);
+        remove_from_free_list(block);
+        remove_from_free_list(next_block);
+        new_block->header = new_header;
+        sf_footer* new_footer = (sf_footer*)((void*)new_block+size);
+        *new_footer = new_block->header;
+        insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(size)],new_block);
+        return new_block;
     }
-    //case 3: previous is free but next is allocated
     else if(!prev_alloc&&next_alloc){
-        size_t prev_block_size = GET_SIZE(free_block->prev_footer);
-        sf_block* prev_block = (sf_block*)((void*)free_block-prev_block_size+sizeof(sf_footer));
-        size_t new_size = prev_block_size+size;
-        prev_block->header = PACK(new_size,GET_PREV_BLOCK_ALLOCATED(prev_block->header),0,0);
-        free_block->body.links.next->body.links.prev = prev_block;
-        prev_block->body.links.next = free_block->body.links.next;
-        sf_footer* prev_block_footer = (sf_footer*)((void*)prev_block+new_size);
-        *prev_block_footer = prev_block->header;
-        return prev_block;
+        size_t prev_block_size = GET_SIZE(block->prev_footer);
+        sf_block* prev_block = (sf_block*)((void*)block-prev_block_size);
+        sf_block* new_block = prev_block;
+        size+=prev_block_size;
+        sf_header new_header = PACK(size,GET_PREV_BLOCK_ALLOCATED(prev_block->header),0,0);
+        remove_from_free_list(prev_block);
+        remove_from_free_list(block);
+        new_block->header = new_header;
+        sf_footer* new_footer = (sf_footer*)((void*)new_block+size);
+        *new_footer = new_block->header;
+        insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(size)],new_block);
+        return new_block;
     }
     else{
-        size_t prev_block_size = GET_SIZE(free_block->prev_footer);
-        sf_block* prev_block = (sf_block*)((void*)free_block-prev_block_size+sizeof(sf_footer));
-        size_t new_size = prev_block_size+size+GET_SIZE(next_block->header);
-        prev_block->header = PACK(new_size,GET_PREV_BLOCK_ALLOCATED(prev_block->header),0,0);
-        next_block->body.links.next->body.links.prev = prev_block;
-        prev_block->body.links.next = next_block->body.links.next;
-        sf_footer* prev_block_footer = (sf_footer*)((void*)prev_block+new_size);
-        *prev_block_footer = prev_block->header;
-        return prev_block;
+        return NULL;
     }
+    
 }
+
+// void *coalesce(void *bp){
+//     sf_block* free_block = (sf_block*)((void*)bp);
+//     size_t size = GET_SIZE(free_block->header);
+//     size_t prev_alloc = GET_PREV_BLOCK_ALLOCATED(free_block->header);
+//     sf_block* next_block = (sf_block*)((void*)free_block+size);
+//     size_t next_alloc = GET_THIS_BLOCK_ALLOCATED(next_block->header);
+
+//     if(!next_alloc){
+//         size += GET_SIZE(next_block->header);
+//         remove_from_free_list(next_block);
+//         //sf_show_block(next_block);
+//     }
+//     if(!prev_alloc){
+//         size_t prev_block_size = GET_SIZE(free_block->prev_footer);
+//         sf_block* prev_block = (sf_block*)((void*)free_block-prev_block_size);
+//         //sf_show_block(prev_block);
+//         size += prev_block_size;
+//         free_block = prev_block;
+//         //sf_show_block(free_block);
+//         remove_from_free_list(prev_block);
+//         //sf_show_block(prev_block);
+//     }
+//     free_block->header = PACK(size,GET_PREV_BLOCK_ALLOCATED(free_block->header),0,0);
+//     sf_footer* new_footer = (sf_footer*)((void*)free_block+size);
+//     *new_footer = free_block->header;
+//     insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(size)],free_block);
+//     //sf_show_block(free_block);
+//     remove_from_free_list((sf_block*)bp);
+//     return free_block;
+// }
 // void flush_quick_list(sf_block* first_block){
 
 // }

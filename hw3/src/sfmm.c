@@ -37,37 +37,59 @@ void *sf_malloc(size_t size) {
     If block_to_allocate is still null, means the heap doesn't have enough memory to allocate. 
     So we have add a page to the heap
     */
-    // if(block_to_allocate==NULL){
-    //     //add memory of pages to allocate
-    //     int num_pages = 0;
-    //     if(allocate%PAGE_SZ==0){
-    //         num_pages = allocate/PAGE_SZ;
-    //     }
-    //     else{
-    //         num_pages = (int)(allocate/PAGE_SZ)+1;
-    //     }
-    //     for(int i = 0; i<num_pages;i++){
-    //         if(sf_mem_grow()==NULL){//no memory left to extend heap
-    //             sf_errno = ENOMEM;
-    //             return NULL;
-    //         }
-    //         else{
-    //             sf_block* new_block = (sf_block*)((void*)epilogue-MEM_ROW);
-    //             new_block->header = PACK(PAGE_SZ,GET_PREV_BLOCK_ALLOCATED(epilogue->header),0,1);
-    //             epilogue = (sf_block*)((void*)sf_mem_end()-16);
-    //             epilogue->header = PACK(0,0,THIS_BLOCK_ALLOCATED,0);
-    //             coalesce(new_block);
-    //         }
-    //     }
-
-    // }
+    if(block_to_allocate==NULL){
+        //add memory of pages to allocate
+        int num_pages = 0;
+        size_t prev_alloc = GET_PREV_BLOCK_ALLOCATED(epilogue->header);
+        if(allocate%PAGE_SZ==0){
+            num_pages = allocate/PAGE_SZ;
+        }
+        else{
+            num_pages = (int)(allocate/PAGE_SZ)+1;
+        }
+        if(!prev_alloc){
+            size_t curr_free = GET_SIZE(epilogue->prev_footer);
+            if(curr_free==8144){
+                num_pages-=1;
+            }
+        }
+        //sf_show_heap();
+        int i;
+        for(i = 1; i<=num_pages;i++){
+            if(sf_mem_grow()==NULL){//no memory left to extend heap
+                break;
+            }
+        }
+        if(--i!=num_pages){
+            num_pages=i;
+        }
+        block_to_allocate = (sf_block*)((void*)epilogue);
+        block_to_allocate->header = PACK(PAGE_SZ*num_pages,prev_alloc,0,0);
+        sf_footer* block_footer = (sf_footer*)((void*)block_to_allocate+PAGE_SZ*num_pages);
+        *block_footer = block_to_allocate->header;
+        epilogue = (sf_block*)((void*)sf_mem_end()-16);
+        epilogue->header = PACK(0,0,THIS_BLOCK_ALLOCATED,0);
+        insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(PAGE_SZ)],block_to_allocate);
+        block_to_allocate = coalesce(block_to_allocate);
+        size_t s = GET_SIZE(block_to_allocate->header);
+        if(s<allocate){
+            sf_errno = ENOMEM;
+            return NULL;
+        }
+    }
+    current_aggregated_payload += (allocate-sizeof(sf_header));
+    if(current_aggregated_payload>max_aggregated_payload){
+        max_aggregated_payload = current_aggregated_payload;
+    }
     //Allocate the block found 
     return &allocate_free_block(allocate,block_to_allocate)->body.payload;
 }
 
 void sf_free(void *pp) {
     //check if pointer is valid, if not, program is aborted
-    is_valid_pointer(pp);
+    if(!is_valid_pointer(pp)){
+        abort();
+    }
     //check block size and decide is free list is to be added in quicklist or free_list_heads
     sf_block* free_block = (sf_block*)((char*)pp-sizeof(sf_header)-sizeof(sf_footer));
     size_t size = GET_SIZE(free_block->header);
@@ -85,19 +107,47 @@ void sf_free(void *pp) {
         next_block->header = (((next_block->header)^MAGIC)&(~PREV_BLOCK_ALLOCATED))^MAGIC;
         insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(size)],free_block);
         coalesce(free_block); 
-        
     }
+    current_aggregated_payload-=(size-sizeof(sf_header));
     //if quicklist consider 2 situtation: 1. list for that size has capacity, 2. doesn't have capacity. 
     //for, 1: simply insert it in quicklist 
     //for 2: need to flush that list which contains coalescing 
     //for large blocks, add it to free_list_heads and coalesce
-
-    //abort();
 }
 
 void *sf_realloc(void *pp, size_t rsize) {
-    // To be implemented.
-    abort();
+    if(!is_valid_pointer(pp)){
+        sf_errno = EINVAL;
+        return NULL;
+    }
+    if(rsize==0){
+        sf_free(pp);
+        return NULL;
+    }
+    sf_block* r_block = (sf_block*)((void*)pp-16);
+    size_t block_size = GET_SIZE(r_block->header);
+    size_t allocate = size_to_allocate(rsize);
+    if(allocate<=block_size){//smaller block realloc
+        size_t remainder = block_size-allocate;
+        if(remainder<MIN_BLOCK_SIZE){//do not create splinters
+            return pp;
+        }
+        else{
+            r_block = split_to_allocate(allocate,r_block);
+            return r_block->body.payload;
+        }
+    }
+    else{//larger block realloc
+        void* block = sf_malloc(rsize);
+        if(block==NULL){
+            return NULL;
+        }
+        memcpy(block,pp,rsize);
+        sf_free(pp);
+        return block;
+    }
+
+    //abort();
 }
 
 double sf_fragmentation() {
@@ -106,6 +156,10 @@ double sf_fragmentation() {
 }
 
 double sf_utilization() {
-    // To be implemented.
-    abort();
+    if(sf_mem_start()==sf_mem_end()){
+        return 0.0;
+    }
+    double current_heap_size = (double)(sf_mem_end()-sf_mem_start());
+    double peak_utilization = (double)max_aggregated_payload/current_heap_size;
+    return peak_utilization;
 }

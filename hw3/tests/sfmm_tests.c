@@ -191,7 +191,7 @@ Test(sfmm_basecode_suite, freelist, .timeout = TEST_TIMEOUT) {
 }
 
 Test(sfmm_basecode_suite, realloc_larger_block, .timeout = TEST_TIMEOUT) {
-        size_t sz_x = sizeof(int), sz_y = 10, sz_x1 = sizeof(int) * 20;
+    size_t sz_x = sizeof(int), sz_y = 10, sz_x1 = sizeof(int) * 20;
 	void *x = sf_malloc(sz_x);
 	/* void *y = */ sf_malloc(sz_y);
 	x = sf_realloc(x, sz_x1);
@@ -230,7 +230,7 @@ Test(sfmm_basecode_suite, realloc_smaller_block_splinter, .timeout = TEST_TIMEOU
 }
 
 Test(sfmm_basecode_suite, realloc_smaller_block_free_block, .timeout = TEST_TIMEOUT) {
-        size_t sz_x = sizeof(double) * 8, sz_y = sizeof(int);
+    size_t sz_x = sizeof(double) * 8, sz_y = sizeof(int);
 	void *x = sf_malloc(sz_x);
 	void *y = sf_realloc(x, sz_y);
 
@@ -258,3 +258,70 @@ Test(sfmm_basecode_suite, realloc_smaller_block_free_block, .timeout = TEST_TIME
 
 //Test(sfmm_student_suite, student_test_1, .timeout = TEST_TIMEOUT) {
 //}
+
+Test(sfmm_student_suite, flush_quicklist, .timeout=TEST_TIMEOUT){
+	sf_errno = 0;
+	size_t sz_u = 10, sz_v = 3, sz_w = 5, sz_x = 8, sz_y = 20, sz_z = 1;
+
+	void *u = sf_malloc(sz_u);
+	void *v = sf_malloc(sz_v);
+	void *w = sf_malloc(sz_w);
+	void *x = sf_malloc(sz_x);
+	void *y = sf_malloc(sz_y);
+	void *z = sf_malloc(sz_z);
+
+	sf_free(u);
+	sf_free(v);
+	sf_free(w);
+	sf_free(x);
+	sf_free(y);
+	sf_free(z);
+
+	assert_quick_list_block_count(0, 1);
+	assert_quick_list_block_count(32, 1);
+	assert_free_block_count(0, 2);
+	assert_free_block_count(160, 1);
+	assert_free_block_count(7952, 1);
+	cr_assert(sf_errno == 0, "sf_errno is not zero!");
+}
+
+Test(sfmm_student_suite, coalesce_prev_and_next, .timeout=TEST_TIMEOUT){
+	sf_errno = 0;
+	size_t sz_x = 2000, sz_y = 1000, sz_z = 500;
+	void *x = sf_malloc(sz_x);
+	void *y = sf_malloc(sz_y);
+    void* z = sf_malloc(sz_z);
+    
+    sf_free(x);
+    sf_free(z);
+    sf_free(y);
+
+	assert_quick_list_block_count(0,0);
+	assert_free_block_count(0,1);
+	assert_free_block_count(8144,1);
+	cr_assert(sf_errno == 0, "sf_errno is not zero!");
+}
+
+Test(sfmm_student_suite, malloc_edge_case, .timeout=TEST_TIMEOUT){
+	sf_errno = 0; 
+	size_t sz_x = 0;
+	cr_assert(sf_malloc(sz_x)==NULL,"malloc should return NULL on size 0");
+}
+
+Test(sfmm_student_suite, free_invalid_pointer, .signal=SIGABRT){
+	size_t sz_x = 2000;
+	void *x = sf_malloc(sz_x);
+	void *y = ((void*)x-900);
+    sf_free(y);
+}
+
+Test(sfmm_student_suite, realloc_invalid_pointer, .timeout=TEST_TIMEOUT){
+	size_t sz_x = 2000;
+	void *x = sf_malloc(sz_x);
+	void *y = ((void*)x-900);
+	void *z = sf_realloc(y,100);
+    
+	cr_assert_not_null(z==NULL,"z is not NULL!");
+	cr_assert(sf_errno == EINVAL, "sf_errno not set to EINVAL");
+}
+

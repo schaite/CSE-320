@@ -7,13 +7,14 @@ int initialize_heap(){
         sf_errno = ENOMEM;
         return -1;
     }
-
+    max_aggregated_payload = 0;
+    current_aggregated_payload = 0;
     //initialize prologue block
-    sf_block* prologue = (sf_block*)((void*)sf_mem_start());
+    prologue = (sf_block*)((void*)sf_mem_start());
     prologue->header = PACK(MIN_BLOCK_SIZE,PREV_BLOCK_ALLOCATED,THIS_BLOCK_ALLOCATED,0);
     //initialize Epilogue block
-    sf_block* epilogue = (sf_block*)((void*)sf_mem_start()+PAGE_SZ-16);
-    epilogue->header = PACK(0,PREV_BLOCK_ALLOCATED,THIS_BLOCK_ALLOCATED,0);
+    epilogue = (sf_block*)((void*)sf_mem_start()+PAGE_SZ-16);
+    epilogue->header = PACK(0,0,THIS_BLOCK_ALLOCATED,0);
     //initialize the free_list_heads array with sentinels
     init_free_list_heads();
     //initialize the first block
@@ -99,12 +100,27 @@ void insert_into_quick_list(sf_block* free_block, size_t size){
         sf_quick_lists[qklst_index].first = free_block;
         sf_quick_lists[qklst_index].length++;
     }
-    //else{//This quicklist doesn't have anymore spcae
+    else{//This quicklist doesn't have anymore spcae
     //flush the current blocks of this list to free_list_heads[coalesce if needed]
-
     //insert the free_block in the empty list 
-
-    //}
+    for(int i = 0; i<5; i++){
+        sf_block* qk_block = sf_quick_lists[qklst_index].first;
+        size_t qk_size = GET_SIZE(qk_block->header);
+        qk_block->header = PACK(qk_size,GET_PREV_BLOCK_ALLOCATED(qk_block->header),0,0);
+        sf_quick_lists[qklst_index].first = qk_block->body.links.next;
+        sf_footer* qk_footer = (sf_footer*)((void*)qk_block+qk_size);
+        *qk_footer = qk_block->header;
+        sf_block* next_block = (sf_block*)((void*)qk_block+qk_size);
+        next_block->header = ((next_block->header^MAGIC)&(~PREV_BLOCK_ALLOCATED))^MAGIC;
+        insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(size)],qk_block);
+        coalesce(qk_block);
+        sf_quick_lists[qklst_index].length--;
+    }
+    free_block->header = PACK(size,GET_PREV_BLOCK_ALLOCATED(free_block->header),THIS_BLOCK_ALLOCATED,IN_QUICK_LIST);
+    free_block->body.links.next = sf_quick_lists[qklst_index].first;
+    sf_quick_lists[qklst_index].first = free_block;
+    sf_quick_lists[qklst_index].length++;
+    }
 }
 
 size_t size_to_allocate(size_t size){
@@ -182,27 +198,32 @@ sf_block* split_to_allocate(size_t size, sf_block* free_block){
     sf_footer* new_free_block_footer = (sf_footer*)((char*)free_block+new_free_block_size);
     *new_free_block_footer = free_block->header;
 
+
     //create the new block to be allocated:
 
     //1. set allocated block pointer where free block ends
     sf_block* allocated_block = (sf_block*)((char*)free_block+new_free_block_size);
     //2. set header size, and bits
     allocated_block->header = PACK(size,0,THIS_BLOCK_ALLOCATED,0);
+    
+    remove_from_free_list(free_block);
+    insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(new_free_block_size)],free_block);
+    coalesce(free_block);
 
     //update the following block of free_block with PREV_BLOCK_ALLOCATED[did it in the beginning, as i'm gonna lose the pointer]
     sf_block* next_block = (sf_block*)(((char*)allocated_block)+size);
     next_block->header = ((next_block->header^MAGIC)|PREV_BLOCK_ALLOCATED)^MAGIC;
 
-    //insert the new_free_block in free_list_heads
-    insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(new_free_block_size)],free_block);
+    // //insert the new_free_block in free_list_heads
+    // insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(new_free_block_size)],free_block);
 
     return allocated_block;
 }
 
-void is_valid_pointer(void *pp){
+int is_valid_pointer(void *pp){
     //Pointer is null or the memory address isn't multiple of 16 
     if(pp==NULL||(uintptr_t)pp%16!=0){
-        abort();
+        return 0;
     }
     //get pointer to the starting of the block
     sf_block *ptr = (sf_block*)((char*)pp-sizeof(sf_header)-sizeof(sf_footer));
@@ -211,23 +232,24 @@ void is_valid_pointer(void *pp){
 
     //Size of the block is less than 32 or the size of the block isn't 16 byte aligned 
     if((size<32) || (size%16!=0)){
-        abort();
+        return 0;
     }
     //Header of the block is before the start of the first block of the heap 
     //or, Footer of the block is after the end of the last block of the heap
     void* first_block_start = sf_mem_start()+MIN_BLOCK_SIZE+MEM_ROW;
     void* last_block_end = sf_mem_end()-MEM_ROW;//start of epilogue
     if(((char*)ptr+MEM_ROW)<(char*)first_block_start||(char*)ptr+size>=(char*)last_block_end){
-        abort();
+        return 0;;
     }
     //alloc bit is 0 or in_qklst bit is 1
     if(!(ptr_header&THIS_BLOCK_ALLOCATED) || (ptr_header&IN_QUICK_LIST)){
-        abort();
+        return 0;
     }
     //prev_alloc is 0, while alloc of prev_footer is 1
     if(!(ptr_header&PREV_BLOCK_ALLOCATED)&&((ptr->prev_footer^MAGIC)&THIS_BLOCK_ALLOCATED)){
-        abort();
+        return 0;
     }
+    return -1;
 }
 
 void remove_from_free_list(sf_block* block){
@@ -275,42 +297,20 @@ void *coalesce(sf_block* block){
         return new_block;
     }
     else{
-        return NULL;
+        size_t prev_block_size = GET_SIZE(block->prev_footer);
+        sf_block* prev_block = (sf_block*)((void*)block-prev_block_size);
+        sf_block* new_block = prev_block;
+        size = size+prev_block_size+GET_SIZE(next_block->header);
+        sf_header new_header = PACK(size,GET_PREV_BLOCK_ALLOCATED(prev_block->header),0,0);
+        remove_from_free_list(prev_block);
+        remove_from_free_list(block);
+        remove_from_free_list(next_block);
+        new_block->header = new_header;
+        sf_footer* new_footer = (sf_footer*)((void*)new_block+size);
+        *new_footer = new_block->header;
+        insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(size)],new_block);
+        return new_block;
     }
     
 }
-
-// void *coalesce(void *bp){
-//     sf_block* free_block = (sf_block*)((void*)bp);
-//     size_t size = GET_SIZE(free_block->header);
-//     size_t prev_alloc = GET_PREV_BLOCK_ALLOCATED(free_block->header);
-//     sf_block* next_block = (sf_block*)((void*)free_block+size);
-//     size_t next_alloc = GET_THIS_BLOCK_ALLOCATED(next_block->header);
-
-//     if(!next_alloc){
-//         size += GET_SIZE(next_block->header);
-//         remove_from_free_list(next_block);
-//         //sf_show_block(next_block);
-//     }
-//     if(!prev_alloc){
-//         size_t prev_block_size = GET_SIZE(free_block->prev_footer);
-//         sf_block* prev_block = (sf_block*)((void*)free_block-prev_block_size);
-//         //sf_show_block(prev_block);
-//         size += prev_block_size;
-//         free_block = prev_block;
-//         //sf_show_block(free_block);
-//         remove_from_free_list(prev_block);
-//         //sf_show_block(prev_block);
-//     }
-//     free_block->header = PACK(size,GET_PREV_BLOCK_ALLOCATED(free_block->header),0,0);
-//     sf_footer* new_footer = (sf_footer*)((void*)free_block+size);
-//     *new_footer = free_block->header;
-//     insert_into_free_list_heads(&sf_free_list_heads[get_free_list_index(size)],free_block);
-//     //sf_show_block(free_block);
-//     remove_from_free_list((sf_block*)bp);
-//     return free_block;
-// }
-// void flush_quick_list(sf_block* first_block){
-
-// }
 

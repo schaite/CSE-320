@@ -18,6 +18,11 @@
 #define GET_THIS_BLOCK_ALLOCATED(header) (((header)^(MAGIC))&(THIS_BLOCK_ALLOCATED))
 #define GET_IN_QUICK_LIST(header) (((header)^(MAGIC))&(PREV_BLOCK_ALLOCATED))
 
+sf_block* prologue;
+sf_block* epilogue;
+size_t max_aggregated_payload;
+size_t current_aggregated_payload;
+
 
 int initialize_heap();
 void init_free_list_heads();
@@ -30,7 +35,8 @@ sf_block*  search_qklst(size_t size);
 sf_block* search_free_list_heads(size_t size);
 sf_block* allocate_free_block(size_t size, sf_block* block_to_allocate);
 sf_block* split_to_allocate(size_t size, sf_block* free_block);
-void is_valid_pointer(void *pp);
+int is_valid_pointer(void *pp);
+void remove_from_free_list(sf_block* block);
 void *coalesce(sf_block* block);
 
 

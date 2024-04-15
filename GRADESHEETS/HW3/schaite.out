@@ -1,0 +1,98 @@
+[----] Criterion v2.3.3
+[====] Running 28 tests from sf_memsuite_grading:
+[RUN ] sf_memsuite_grading::free_block_too_small
+[PASS] sf_memsuite_grading::free_block_too_small: (0.00s)
+[RUN ] sf_memsuite_grading::free_null
+[PASS] sf_memsuite_grading::free_null: (0.00s)
+[RUN ] sf_memsuite_grading::free_unallocated
+[PASS] sf_memsuite_grading::free_unallocated: (0.00s)
+[RUN ] sf_memsuite_grading::initialization
+[PASS] sf_memsuite_grading::initialization: (0.00s)
+[RUN ] sf_memsuite_grading::malloc_free_coalesce_both
+[----] tests/__grading_helpers.c:116: Assertion failed: Block 0x7fa67f7bbf38 has wrong block_size (got 208, expected 944)
+[FAIL] sf_memsuite_grading::malloc_free_coalesce_both: (0.00s)
+[RUN ] sf_memsuite_grading::malloc_free_coalesce_lower
+[----] tests/__grading_helpers.c:116: Assertion failed: Block 0x7f3b88a53df8 has wrong block_size (got 320, expected 736)
+[FAIL] sf_memsuite_grading::malloc_free_coalesce_lower: (0.00s)
+[RUN ] sf_memsuite_grading::malloc_free_coalesce_upper
+[----] tests/__grading_helpers.c:116: Assertion failed: Block 0x7fd43ebcadf8 has wrong block_size (got 320, expected 736)
+[FAIL] sf_memsuite_grading::malloc_free_coalesce_upper: (0.00s)
+[RUN ] sf_memsuite_grading::malloc_free_first_block
+[PASS] sf_memsuite_grading::malloc_free_first_block: (0.00s)
+[RUN ] sf_memsuite_grading::malloc_free_last_block
+[----] tests/grading_tests_p1.c:308: Unexpected signal caught below this line!
+[FAIL] sf_memsuite_grading::malloc_free_last_block: CRASH!
+[RUN ] sf_memsuite_grading::malloc_free_lifo
+[----] tests/grading_tests_p2.c:8: Unexpected signal caught below this line!
+[FAIL] sf_memsuite_grading::malloc_free_lifo: CRASH!
+[RUN ] sf_memsuite_grading::malloc_free_no_coalesce
+[PASS] sf_memsuite_grading::malloc_free_no_coalesce: (0.00s)
+[RUN ] sf_memsuite_grading::malloc_to_exhaustion
+[----] tests/grading_tests_p1.c:376: Unexpected signal caught below this line!
+[FAIL] sf_memsuite_grading::malloc_to_exhaustion: CRASH!
+[RUN ] sf_memsuite_grading::malloc_with_splinter
+[----] tests/grading_tests_p1.c:337: Unexpected signal caught below this line!
+[FAIL] sf_memsuite_grading::malloc_with_splinter: CRASH!
+[RUN ] sf_memsuite_grading::multiple_quick_lists
+[PASS] sf_memsuite_grading::multiple_quick_lists: (0.00s)
+[RUN ] sf_memsuite_grading::realloc_larger
+[PASS] sf_memsuite_grading::realloc_larger: (0.00s)
+[RUN ] sf_memsuite_grading::realloc_same
+[PASS] sf_memsuite_grading::realloc_same: (0.01s)
+[RUN ] sf_memsuite_grading::realloc_size_0
+[PASS] sf_memsuite_grading::realloc_size_0: (0.00s)
+[RUN ] sf_memsuite_grading::realloc_smaller
+[----] tests/grading_tests_p2.c:98: Assertion failed: realloc to smaller size did not return same payload pointer
+[FAIL] sf_memsuite_grading::realloc_smaller: (0.01s)
+[RUN ] sf_memsuite_grading::realloc_splinter
+[PASS] sf_memsuite_grading::realloc_splinter: (0.00s)
+[RUN ] sf_memsuite_grading::simple_quick_list
+[PASS] sf_memsuite_grading::simple_quick_list: (0.00s)
+[RUN ] sf_memsuite_grading::single_malloc_1
+[PASS] sf_memsuite_grading::single_malloc_1: (0.00s)
+[RUN ] sf_memsuite_grading::single_malloc_16
+[PASS] sf_memsuite_grading::single_malloc_16: (0.00s)
+[RUN ] sf_memsuite_grading::single_malloc_32
+[PASS] sf_memsuite_grading::single_malloc_32: (0.00s)
+[RUN ] sf_memsuite_grading::single_malloc_exactly_one_page_needed
+[----] tests/grading_tests_p1.c:67: Unexpected signal caught below this line!
+[FAIL] sf_memsuite_grading::single_malloc_exactly_one_page_needed: CRASH!
+[RUN ] sf_memsuite_grading::single_malloc_max
+[PASS] sf_memsuite_grading::single_malloc_max: (0.00s)
+[RUN ] sf_memsuite_grading::single_malloc_more_than_one_page_needed
+[----] tests/grading_tests_p1.c:83: Unexpected signal caught below this line!
+[FAIL] sf_memsuite_grading::single_malloc_more_than_one_page_needed: CRASH!
+[RUN ] sf_memsuite_grading::single_malloc_three_pages_needed
+[PASS] sf_memsuite_grading::single_malloc_three_pages_needed: (0.01s)
+[RUN ] sf_memsuite_grading::stress_test
+[----] tests/grading_tests_p2.c:289: Unexpected signal caught below this line!
+[FAIL] sf_memsuite_grading::stress_test: CRASH!
+[====] Running 2 tests from sf_memsuite_stats:
+[RUN ] sf_memsuite_stats::peak_utilization
+[PASS] sf_memsuite_stats::peak_utilization: (0.03s)
+[RUN ] sf_memsuite_stats::stress_test
+[----] tests/grading_tests_p2.c:435: Unexpected signal caught below this line!
+[FAIL] sf_memsuite_stats::stress_test: CRASH!
+[====] Running 10 tests from sfmm_basecode_suite:
+[RUN ] sfmm_basecode_suite::free_coalesce
+[PASS] sfmm_basecode_suite::free_coalesce: (0.00s)
+[RUN ] sfmm_basecode_suite::free_no_coalesce
+[PASS] sfmm_basecode_suite::free_no_coalesce: (0.00s)
+[RUN ] sfmm_basecode_suite::free_quick
+[PASS] sfmm_basecode_suite::free_quick: (0.00s)
+[RUN ] sfmm_basecode_suite::freelist
+[PASS] sfmm_basecode_suite::freelist: (0.00s)
+[RUN ] sfmm_basecode_suite::malloc_an_int
+[PASS] sfmm_basecode_suite::malloc_an_int: (0.00s)
+[RUN ] sfmm_basecode_suite::malloc_four_pages
+[PASS] sfmm_basecode_suite::malloc_four_pages: (0.01s)
+[RUN ] sfmm_basecode_suite::malloc_too_large
+[PASS] sfmm_basecode_suite::malloc_too_large: (0.00s)
+[RUN ] sfmm_basecode_suite::realloc_larger_block
+[PASS] sfmm_basecode_suite::realloc_larger_block: (0.00s)
+[RUN ] sfmm_basecode_suite::realloc_smaller_block_free_block
+[PASS] sfmm_basecode_suite::realloc_smaller_block_free_block: (0.00s)
+[RUN ] sfmm_basecode_suite::realloc_smaller_block_splinter
+[PASS] sfmm_basecode_suite::realloc_smaller_block_splinter: (0.00s)
+[----] Writing xml report in `crit.xml`.
+[====] Synthesis: Tested: 40 | Passing: 28 | Failing: 12 | Crashing: 8 

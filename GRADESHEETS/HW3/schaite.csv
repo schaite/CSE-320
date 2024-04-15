@@ -1,0 +1,44 @@
+Graded Commit:a9df9c5816b517409f6838380a10bd6585c1ddfb
+
+TEST NAME, POINTS,OUT OF
+sf_memsuite_grading/free_block_too_small,1,1,
+sf_memsuite_grading/free_null,1,1,
+sf_memsuite_grading/free_unallocated,1,1,
+sf_memsuite_grading/initialization,1,1,
+sf_memsuite_grading/malloc_free_coalesce_both,0,1,"1 assertion(s) failed.: tests/__grading_helpers.c:116: Block 0x7fa67f7bbf38 has wrong block_size (got 208, expected 944)"
+sf_memsuite_grading/malloc_free_coalesce_lower,0,1,"1 assertion(s) failed.: tests/__grading_helpers.c:116: Block 0x7f3b88a53df8 has wrong block_size (got 320, expected 736)"
+sf_memsuite_grading/malloc_free_coalesce_upper,0,1,"1 assertion(s) failed.: tests/__grading_helpers.c:116: Block 0x7fd43ebcadf8 has wrong block_size (got 320, expected 736)"
+sf_memsuite_grading/malloc_free_first_block,1,1,
+sf_memsuite_grading/malloc_free_last_block,0,1,The test crashed.: None
+sf_memsuite_grading/malloc_free_lifo,0,1,The test crashed.: None
+sf_memsuite_grading/malloc_free_no_coalesce,1,1,
+sf_memsuite_grading/malloc_to_exhaustion,0,1,The test crashed.: None
+sf_memsuite_grading/malloc_with_splinter,0,1,The test crashed.: None
+sf_memsuite_grading/multiple_quick_lists,1,1,
+sf_memsuite_grading/realloc_larger,1,1,
+sf_memsuite_grading/realloc_same,1,1,
+sf_memsuite_grading/realloc_size_0,1,1,
+sf_memsuite_grading/realloc_smaller,0,1,1 assertion(s) failed.: tests/grading_tests_p2.c:98: realloc to smaller size did not return same payload pointer
+sf_memsuite_grading/realloc_splinter,1,1,
+sf_memsuite_grading/simple_quick_list,1,1,
+sf_memsuite_grading/single_malloc_1,1,1,
+sf_memsuite_grading/single_malloc_16,1,1,
+sf_memsuite_grading/single_malloc_32,1,1,
+sf_memsuite_grading/single_malloc_exactly_one_page_needed,0,1,The test crashed.: None
+sf_memsuite_grading/single_malloc_max,1,1,
+sf_memsuite_grading/single_malloc_more_than_one_page_needed,0,1,The test crashed.: None
+sf_memsuite_grading/single_malloc_three_pages_needed,1,1,
+sf_memsuite_grading/stress_test,0,1,The test crashed.: None
+sf_memsuite_stats/peak_utilization,1,1,
+sf_memsuite_stats/stress_test,0,1,The test crashed.: None
+sfmm_basecode_suite/free_coalesce,1,1,
+sfmm_basecode_suite/free_no_coalesce,1,1,
+sfmm_basecode_suite/free_quick,1,1,
+sfmm_basecode_suite/freelist,1,1,
+sfmm_basecode_suite/malloc_an_int,1,1,
+sfmm_basecode_suite/malloc_four_pages,1,1,
+sfmm_basecode_suite/malloc_too_large,1,1,
+sfmm_basecode_suite/realloc_larger_block,1,1,
+sfmm_basecode_suite/realloc_smaller_block_free_block,1,1,
+sfmm_basecode_suite/realloc_smaller_block_splinter,1,1,
+total,28,40

@@ -1,0 +1,911 @@
+--ascii is deprecated. Use LANG/LC_* variables to control encoding, and TERM/--color to control colors.
+[----] Criterion v2.4.1-13-g2f48d0f-dirty (bleeding)
+[====] Running 5 tests from basecode_suite:
+[RUN ] basecode_suite::eof_test
+Running test basecode_suite/eof_test
+                   [expect INIT]
+Waiting for connection...
+1714161552.220484: LEGION: INIT
+1714161552.220534: LEGION: PROMPT
+legion> Connected to child: fd = 10
+1714161552.220642: Driver <~~ INIT (sent at 1714161552.220484)
+                   [expect PROMPT]
+1714161552.220663: Driver <~~ PROMPT (sent at 1714161552.220534)
+>>> EOT
+                   [expect ERROR]
+1714161552.220696: LEGION: ERROR (End of transmission (Ctrl-D))
+1714161552.220708: LEGION: FINI
+1714161552.220943: Driver <~~ ERROR (sent at 1714161552.220696)
+                   [expect FINI]
+1714161552.220966: Driver <~~ FINI (sent at 1714161552.220708)
+                   [expect EOF]
+Short count reading event
+End of test basecode_suite/eof_test
+[PASS] basecode_suite::eof_test: (0.00s)
+[RUN ] basecode_suite::quit_test
+Running test basecode_suite/quit_test
+                   [expect INIT]
+Waiting for connection...
+1714161552.292192: LEGION: INIT
+Connected to child: fd = 10
+1714161552.292233: LEGION: PROMPT
+1714161552.292256: Driver <~~ INIT (sent at 1714161552.292192)
+legion>                    [expect PROMPT]
+1714161552.292280: Driver <~~ PROMPT (sent at 1714161552.292233)
+>>> quit
+                   [expect FINI]
+1714161552.292331: LEGION: FINI
+Exiting.
+1714161552.292533: Driver <~~ FINI (sent at 1714161552.292331)
+                   [expect EOF]
+Short count reading event
+End of test basecode_suite/quit_test
+[PASS] basecode_suite::quit_test: (0.00s)
+[RUN ] basecode_suite::start_single_test
+Running test basecode_suite/start_single_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161552.360096: LEGION: INIT
+1714161552.360384: LEGION: PROMPT
+legion> 1714161552.360461: Driver <~~ INIT (sent at 1714161552.360096)
+                   [expect PROMPT]
+1714161552.360488: Driver <~~ PROMPT (sent at 1714161552.360384)
+>>> register lazy lazy
+                   [expect REGISTER]
+unknown command: register lazy lazy
+1714161552.360539: LEGION: PROMPT
+legion> 1714161552.360570: Driver <~~ PROMPT (sent at 1714161552.360539)
+Read event type PROMPT, expected type REGISTER
+Aborting test basecode_suite/start_single_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] basecode_suite::start_single_test: (0.00s)
+[RUN ] basecode_suite::status_all_empty_test
+Running test basecode_suite/status_all_empty_test
+                   [expect INIT]
+Waiting for connection...
+1714161552.428475: LEGION: INIT
+1714161552.428513: LEGION: PROMPT
+legion> Connected to child: fd = 10
+1714161552.428601: Driver <~~ INIT (sent at 1714161552.428475)
+                   [expect PROMPT]
+1714161552.428620: Driver <~~ PROMPT (sent at 1714161552.428513)
+>>> status-all
+                   [expect PROMPT]
+unknown command: status-all
+1714161552.428670: LEGION: PROMPT
+legion> 1714161552.428706: Driver <~~ PROMPT (sent at 1714161552.428670)
+>>> quit
+                   [expect FINI]
+1714161552.428727: LEGION: FINI
+Exiting.
+1714161552.428939: Driver <~~ FINI (sent at 1714161552.428727)
+                   [expect EOF]
+Short count reading event
+End of test basecode_suite/status_all_empty_test
+[PASS] basecode_suite::status_all_empty_test: (0.00s)
+[RUN ] basecode_suite::status_all_single_test
+Running test basecode_suite/status_all_single_test
+                   [expect INIT]
+Waiting for connection...
+1714161552.500066: LEGION: INIT
+Connected to child: fd = 10
+1714161552.500098: LEGION: PROMPT
+1714161552.500124: Driver <~~ INIT (sent at 1714161552.500066)
+legion>                    [expect PROMPT]
+1714161552.500148: Driver <~~ PROMPT (sent at 1714161552.500098)
+>>> register lazy lazy
+                   [expect REGISTER]
+unknown command: register lazy lazy
+1714161552.500202: LEGION: PROMPT
+legion> 1714161552.500224: Driver <~~ PROMPT (sent at 1714161552.500202)
+Read event type PROMPT, expected type REGISTER
+Aborting test basecode_suite/status_all_single_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] basecode_suite::status_all_single_test: (0.00s)
+[====] Running 4 tests from logcheck_suite:
+[RUN ] logcheck_suite::emptyspace_parse_test
+Running test logcheck_suite/emptyspace_parse_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161552.606039: Driver <~~ INIT (sent at 1714161552.606012)
+                   [expect PROMPT]
+1714161552.606012: LEGION: INIT
+1714161552.606097: Driver <~~ PROMPT (sent at 1714161552.606084)
+>>> register 'my emptyspace test' logcheck
+                   [expect REGISTER]
+1714161552.606084: LEGION: PROMPT
+legion> unknown command: register 'my emptyspace test' logcheck
+1714161552.606197: Driver <~~ PROMPT (sent at 1714161552.606183)
+Read event type PROMPT, expected type REGISTER
+Aborting test logcheck_suite/emptyspace_parse_test
+[----] tests/__helper.c:52: Assertion Failed
+[----]   
+[----]   File 'logs/my emptyspace test.log.0' does not exist 
+[----]   
+[FAIL] logcheck_suite::emptyspace_parse_test: (0.03s)
+bin/legion: no process found
+[RUN ] logcheck_suite::log_exists_test
+Running test logcheck_suite/log_exists_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161552.642691: LEGION: INIT
+1714161552.642716: LEGION: PROMPT
+1714161552.642737: Driver <~~ INIT (sent at 1714161552.642691)
+legion>                    [expect PROMPT]
+1714161552.642763: Driver <~~ PROMPT (sent at 1714161552.642716)
+>>> register my_log logcheck
+                   [expect REGISTER]
+unknown command: register my_log logcheck
+1714161552.642804: LEGION: PROMPT
+legion> 1714161552.642861: Driver <~~ PROMPT (sent at 1714161552.642804)
+Read event type PROMPT, expected type REGISTER
+Aborting test logcheck_suite/log_exists_test
+[----] tests/__helper.c:52: Assertion Failed
+[----]   
+[----]   File 'logs/my_log.log.0' does not exist 
+[----]   
+[FAIL] logcheck_suite::log_exists_test: (0.02s)
+bin/legion: no process found
+[RUN ] logcheck_suite::logrotate_test
+Running test logcheck_suite/logrotate_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161552.683391: Driver <~~ INIT (sent at 1714161552.683370)
+                   [expect PROMPT]
+1714161552.683370: LEGION: INIT
+1714161552.683554: Driver <~~ PROMPT (sent at 1714161552.683540)
+>>> register my_log_rot logcheck
+                   [expect REGISTER]
+1714161552.683540: LEGION: PROMPT
+legion> unknown command: register my_log_rot logcheck
+1714161552.683930: Driver <~~ PROMPT (sent at 1714161552.683904)
+Read event type PROMPT, expected type REGISTER
+Aborting test logcheck_suite/logrotate_test
+[----] tests/__helper.c:52: Assertion Failed
+[----]   
+[----]   File 'logs/my_log_rot.log.0' does not exist 
+[----]   
+[FAIL] logcheck_suite::logrotate_test: (0.02s)
+bin/legion: no process found
+[RUN ] logcheck_suite::register_extra_arg_test
+Running test logcheck_suite/register_extra_arg_test
+                   [expect INIT]
+Waiting for connection...
+1714161552.727234: LEGION: INIT
+Connected to child: fd = 10
+1714161552.727295: Driver <~~ INIT (sent at 1714161552.727234)
+                   [expect PROMPT]
+1714161552.727397: LEGION: PROMPT
+1714161552.727442: Driver <~~ PROMPT (sent at 1714161552.727397)
+>>> register my_extra_arg logcheck these are extra args
+                   [expect REGISTER]
+legion> unknown command: register my_extra_arg logcheck these are extra args
+1714161552.727590: LEGION: PROMPT
+1714161552.727607: Driver <~~ PROMPT (sent at 1714161552.727590)
+Read event type PROMPT, expected type REGISTER
+Aborting test logcheck_suite/register_extra_arg_test
+[----] tests/__helper.c:52: Assertion Failed
+[----]   
+[----]   File 'logs/my_extra_arg.log.0' does not exist 
+[----]   
+[FAIL] logcheck_suite::register_extra_arg_test: (0.02s)
+bin/legion: no process found
+[====] Running 25 tests from tracker_suite:
+[RUN ] tracker_suite::crash_reset_test
+Running test tracker_suite/crash_reset_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161552.751273: LEGION: INIT
+1714161552.751304: LEGION: PROMPT
+1714161552.751322: Driver <~~ INIT (sent at 1714161552.751273)
+legion>                    [expect PROMPT]
+1714161552.751346: Driver <~~ PROMPT (sent at 1714161552.751304)
+>>> register crash crash
+                   [expect REGISTER]
+unknown command: register crash crash
+1714161552.751386: LEGION: PROMPT
+legion> 1714161552.751410: Driver <~~ PROMPT (sent at 1714161552.751386)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/crash_reset_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::crash_reset_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::crash_test
+Running test tracker_suite/crash_test
+                   [expect INIT]
+Waiting for connection...
+1714161552.827170: LEGION: INIT
+1714161552.827212: LEGION: PROMPT
+legion> Connected to child: fd = 10
+1714161552.827324: Driver <~~ INIT (sent at 1714161552.827170)
+                   [expect PROMPT]
+1714161552.827349: Driver <~~ PROMPT (sent at 1714161552.827212)
+>>> register crash crash
+                   [expect REGISTER]
+unknown command: register crash crash
+1714161552.827399: LEGION: PROMPT
+legion> 1714161552.827421: Driver <~~ PROMPT (sent at 1714161552.827399)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/crash_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::crash_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::help_test
+Running test tracker_suite/help_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161552.899101: LEGION: INIT
+1714161552.899125: LEGION: PROMPT
+1714161552.899138: Driver <~~ INIT (sent at 1714161552.899101)
+                   [expect PROMPT]
+legion> 1714161552.899160: Driver <~~ PROMPT (sent at 1714161552.899125)
+>>> help
+                   [expect PROMPT]
+unknown command: help
+1714161552.899208: LEGION: PROMPT
+legion> 1714161552.899225: Driver <~~ PROMPT (sent at 1714161552.899208)
+>>> quit
+                   [expect FINI]
+1714161552.899284: LEGION: FINI
+1714161552.899304: Driver <~~ FINI (sent at 1714161552.899284)
+Exiting.
+                   [expect EOF]
+Short count reading event
+End of test tracker_suite/help_test
+[PASS] tracker_suite::help_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::lazy_start_stop_multi_test
+Running test tracker_suite/lazy_start_stop_multi_test
+                   [expect INIT]
+Waiting for connection...
+1714161552.973192: LEGION: INIT
+Connected to child: fd = 10
+1714161552.973245: LEGION: PROMPT
+1714161552.973277: Driver <~~ INIT (sent at 1714161552.973192)
+legion>                    [expect PROMPT]
+1714161552.973318: Driver <~~ PROMPT (sent at 1714161552.973245)
+>>> register lazy lazy
+                   [expect REGISTER]
+unknown command: register lazy lazy
+1714161552.973399: LEGION: PROMPT
+legion> 1714161552.973428: Driver <~~ PROMPT (sent at 1714161552.973399)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/lazy_start_stop_multi_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::lazy_start_stop_multi_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::logrotate_error_test
+Running test tracker_suite/logrotate_error_test
+                   [expect INIT]
+Waiting for connection...
+1714161553.052352: LEGION: INIT
+Connected to child: fd = 10
+1714161553.052400: LEGION: PROMPT
+1714161553.052423: Driver <~~ INIT (sent at 1714161553.052352)
+legion>                    [expect PROMPT]
+1714161553.052449: Driver <~~ PROMPT (sent at 1714161553.052400)
+>>> logrotate unknown
+                   [expect ERROR]
+unknown command: logrotate unknown
+1714161553.052602: LEGION: PROMPT
+legion> 1714161553.052770: Driver <~~ PROMPT (sent at 1714161553.052602)
+Read event type PROMPT, expected type ERROR
+Aborting test tracker_suite/logrotate_error_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::logrotate_error_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::logrotate_lazy_test
+Running test tracker_suite/logrotate_lazy_test
+                   [expect INIT]
+Waiting for connection...
+1714161553.126165: LEGION: INIT
+1714161553.126221: LEGION: PROMPT
+legion> Connected to child: fd = 10
+1714161553.126355: Driver <~~ INIT (sent at 1714161553.126165)
+                   [expect PROMPT]
+1714161553.126382: Driver <~~ PROMPT (sent at 1714161553.126221)
+>>> register lazy lazy
+                   [expect REGISTER]
+unknown command: register lazy lazy
+1714161553.126438: LEGION: PROMPT
+legion> 1714161553.126464: Driver <~~ PROMPT (sent at 1714161553.126438)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/logrotate_lazy_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::logrotate_lazy_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::logrotate_two_lazy_test
+Running test tracker_suite/logrotate_two_lazy_test
+                   [expect INIT]
+Waiting for connection...
+1714161553.200198: LEGION: INIT
+1714161553.200249: LEGION: PROMPT
+legion> Connected to child: fd = 10
+1714161553.200370: Driver <~~ INIT (sent at 1714161553.200198)
+                   [expect PROMPT]
+1714161553.200402: Driver <~~ PROMPT (sent at 1714161553.200249)
+>>> register lazy1 lazy
+                   [expect REGISTER]
+unknown command: register lazy1 lazy
+1714161553.200471: LEGION: PROMPT
+legion> 1714161553.200502: Driver <~~ PROMPT (sent at 1714161553.200471)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/logrotate_two_lazy_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::logrotate_two_lazy_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::multi_lazy_test
+Running test tracker_suite/multi_lazy_test
+                   [expect INIT]
+Waiting for connection...
+1714161553.275880: LEGION: INIT
+1714161553.275920: LEGION: PROMPT
+legion> Connected to child: fd = 10
+1714161553.276009: Driver <~~ INIT (sent at 1714161553.275880)
+                   [expect PROMPT]
+1714161553.276027: Driver <~~ PROMPT (sent at 1714161553.275920)
+>>> register lazy1 lazy
+                   [expect REGISTER]
+unknown command: register lazy1 lazy
+1714161553.276069: LEGION: PROMPT
+legion> 1714161553.276094: Driver <~~ PROMPT (sent at 1714161553.276069)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/multi_lazy_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::multi_lazy_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::nosync_test
+Running test tracker_suite/nosync_test
+                   [expect INIT]
+Waiting for connection...
+1714161553.346952: LEGION: INIT
+1714161553.347002: LEGION: PROMPT
+legion> Connected to child: fd = 10
+1714161553.347115: Driver <~~ INIT (sent at 1714161553.346952)
+                   [expect PROMPT]
+1714161553.347136: Driver <~~ PROMPT (sent at 1714161553.347002)
+>>> register nosync nosync
+                   [expect REGISTER]
+unknown command: register nosync nosync
+1714161553.347182: LEGION: PROMPT
+legion> 1714161553.347203: Driver <~~ PROMPT (sent at 1714161553.347182)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/nosync_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::nosync_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::quit_test
+Running test tracker_suite/quit_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161553.423857: Driver <~~ INIT (sent at 1714161553.423828)
+1714161553.423828: LEGION: INIT
+1714161553.423870: LEGION: PROMPT
+                   [expect PROMPT]
+1714161553.423898: Driver <~~ PROMPT (sent at 1714161553.423870)
+>>> quit
+legion>                    [expect FINI]
+1714161553.423937: LEGION: FINI
+Exiting.
+1714161553.424069: Driver <~~ FINI (sent at 1714161553.423937)
+                   [expect EOF]
+Short count reading event
+End of test tracker_suite/quit_test
+[PASS] tracker_suite::quit_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::regi_quit_test
+Running test tracker_suite/regi_quit_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161553.492767: LEGION: INIT
+1714161553.492798: LEGION: PROMPT
+1714161553.492819: Driver <~~ INIT (sent at 1714161553.492767)
+legion>                    [expect PROMPT]
+1714161553.492849: Driver <~~ PROMPT (sent at 1714161553.492798)
+>>> register lazy lazy
+                   [expect REGISTER]
+unknown command: register lazy lazy
+1714161553.492891: LEGION: PROMPT
+legion> 1714161553.492914: Driver <~~ PROMPT (sent at 1714161553.492891)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/regi_quit_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::regi_quit_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::regi_same_name_error_test
+Running test tracker_suite/regi_same_name_error_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161553.631321: LEGION: INIT
+1714161553.631357: LEGION: PROMPT
+1714161553.631377: Driver <~~ INIT (sent at 1714161553.631321)
+legion>                    [expect PROMPT]
+1714161553.631412: Driver <~~ PROMPT (sent at 1714161553.631357)
+>>> register lazy lazy
+                   [expect REGISTER]
+unknown command: register lazy lazy
+1714161553.631531: LEGION: PROMPT
+legion> 1714161553.631560: Driver <~~ PROMPT (sent at 1714161553.631531)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/regi_same_name_error_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::regi_same_name_error_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::regi_unregi_mult_test
+Running test tracker_suite/regi_unregi_mult_test
+                   [expect INIT]
+Waiting for connection...
+1714161553.726800: LEGION: INIT
+1714161553.726836: LEGION: PROMPT
+Connected to child: fd = 10
+legion> 1714161553.726882: Driver <~~ INIT (sent at 1714161553.726800)
+                   [expect PROMPT]
+1714161553.726917: Driver <~~ PROMPT (sent at 1714161553.726836)
+>>> register lazy1 lazy
+                   [expect REGISTER]
+unknown command: register lazy1 lazy
+1714161553.727035: LEGION: PROMPT
+legion> 1714161553.727077: Driver <~~ PROMPT (sent at 1714161553.727035)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/regi_unregi_mult_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::regi_unregi_mult_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::regi_unregi_quit_test
+Running test tracker_suite/regi_unregi_quit_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161553.825046: Driver <~~ INIT (sent at 1714161553.825025)
+                   [expect PROMPT]
+1714161553.825025: LEGION: INIT
+1714161553.825108: Driver <~~ PROMPT (sent at 1714161553.825096)
+>>> register lazy lazy
+                   [expect REGISTER]
+1714161553.825096: LEGION: PROMPT
+legion> unknown command: register lazy lazy
+1714161553.825220: Driver <~~ PROMPT (sent at 1714161553.825205)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/regi_unregi_quit_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::regi_unregi_quit_test: (0.01s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::start_error_test
+Running test tracker_suite/start_error_test
+                   [expect INIT]
+Waiting for connection...
+1714161553.902892: LEGION: INIT
+1714161553.902940: LEGION: PROMPT
+legion> Connected to child: fd = 10
+1714161553.903042: Driver <~~ INIT (sent at 1714161553.902892)
+                   [expect PROMPT]
+1714161553.903063: Driver <~~ PROMPT (sent at 1714161553.902940)
+>>> start unknown
+                   [expect ERROR]
+unknown command: start unknown
+1714161553.903104: LEGION: PROMPT
+legion> 1714161553.903123: Driver <~~ PROMPT (sent at 1714161553.903104)
+Read event type PROMPT, expected type ERROR
+Aborting test tracker_suite/start_error_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::start_error_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::start_quit_test
+Running test tracker_suite/start_quit_test
+                   [expect INIT]
+Waiting for connection...
+1714161553.974599: LEGION: INIT
+1714161553.974637: LEGION: PROMPT
+legion> Connected to child: fd = 10
+1714161553.974733: Driver <~~ INIT (sent at 1714161553.974599)
+                   [expect PROMPT]
+1714161553.974752: Driver <~~ PROMPT (sent at 1714161553.974637)
+>>> register lazy lazy
+                   [expect REGISTER]
+unknown command: register lazy lazy
+1714161553.974798: LEGION: PROMPT
+legion> 1714161553.974816: Driver <~~ PROMPT (sent at 1714161553.974798)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/start_quit_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::start_quit_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::start_stop_lazy_test
+Running test tracker_suite/start_stop_lazy_test
+                   [expect INIT]
+Waiting for connection...
+1714161554.271269: LEGION: INIT
+1714161554.271302: LEGION: PROMPT
+legion> Connected to child: fd = 10
+1714161554.271397: Driver <~~ INIT (sent at 1714161554.271269)
+                   [expect PROMPT]
+1714161554.271418: Driver <~~ PROMPT (sent at 1714161554.271302)
+>>> register lazy lazy
+                   [expect REGISTER]
+unknown command: register lazy lazy
+1714161554.271461: LEGION: PROMPT
+legion> 1714161554.271479: Driver <~~ PROMPT (sent at 1714161554.271461)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/start_stop_lazy_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::start_stop_lazy_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+exec 1.958000 ms.
+[RUN ] tracker_suite::status_all_test
+Running test tracker_suite/status_all_test
+                   [expect INIT]
+Waiting for connection...
+1714161554.490071: LEGION: INIT
+Connected to child: fd = 10
+1714161554.490120: LEGION: PROMPT
+1714161554.490154: Driver <~~ INIT (sent at 1714161554.490071)
+legion>                    [expect PROMPT]
+1714161554.490199: Driver <~~ PROMPT (sent at 1714161554.490120)
+>>> status-all
+                   [expect PROMPT]
+unknown command: status-all
+1714161554.490285: LEGION: PROMPT
+legion> 1714161554.490317: Driver <~~ PROMPT (sent at 1714161554.490285)
+>>> register lazy1 lazy
+                   [expect REGISTER]
+unknown command: register lazy1 lazy
+1714161554.490340: LEGION: PROMPT
+legion> 1714161554.490357: Driver <~~ PROMPT (sent at 1714161554.490340)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/status_all_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::status_all_test: (0.01s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::status_error_test
+Running test tracker_suite/status_error_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161554.645971: LEGION: INIT
+1714161554.646002: LEGION: PROMPT
+1714161554.646019: Driver <~~ INIT (sent at 1714161554.645971)
+                   [expect PROMPT]
+legion> 1714161554.646043: Driver <~~ PROMPT (sent at 1714161554.646002)
+>>> status unknown
+                   [expect ERROR]
+unknown command: status unknown
+1714161554.646082: LEGION: PROMPT
+legion> 1714161554.646107: Driver <~~ PROMPT (sent at 1714161554.646082)
+Read event type PROMPT, expected type ERROR
+Aborting test tracker_suite/status_error_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::status_error_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::status_test
+Running test tracker_suite/status_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161554.722470: LEGION: INIT
+1714161554.722504: LEGION: PROMPT
+1714161554.722520: Driver <~~ INIT (sent at 1714161554.722470)
+legion>                    [expect PROMPT]
+1714161554.722546: Driver <~~ PROMPT (sent at 1714161554.722504)
+>>> register lazy lazy
+                   [expect REGISTER]
+unknown command: register lazy lazy
+1714161554.722587: LEGION: PROMPT
+legion> 1714161554.722610: Driver <~~ PROMPT (sent at 1714161554.722587)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/status_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::status_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::stop_error_test
+Running test tracker_suite/stop_error_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161554.794635: LEGION: INIT
+1714161554.794666: LEGION: PROMPT
+legion> 1714161554.794692: Driver <~~ INIT (sent at 1714161554.794635)
+                   [expect PROMPT]
+1714161554.794719: Driver <~~ PROMPT (sent at 1714161554.794666)
+>>> stop unknown
+                   [expect ERROR]
+unknown command: stop unknown
+1714161554.794761: LEGION: PROMPT
+legion> 1714161554.794785: Driver <~~ PROMPT (sent at 1714161554.794761)
+Read event type PROMPT, expected type ERROR
+Aborting test tracker_suite/stop_error_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::stop_error_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+exec 2.077000 ms.
+[RUN ] tracker_suite::systat_start_end_test
+Running test tracker_suite/systat_start_end_test
+                   [expect INIT]
+Waiting for connection...
+1714161554.865795: LEGION: INIT
+Connected to child: fd = 10
+1714161554.865837: LEGION: PROMPT
+1714161554.865865: Driver <~~ INIT (sent at 1714161554.865795)
+legion>                    [expect PROMPT]
+1714161554.865887: Driver <~~ PROMPT (sent at 1714161554.865837)
+>>> register systat systat
+                   [expect REGISTER]
+unknown command: register systat systat
+1714161554.865940: LEGION: PROMPT
+legion> 1714161554.865961: Driver <~~ PROMPT (sent at 1714161554.865940)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/systat_start_end_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::systat_start_end_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+exec 1.892000 ms.
+[RUN ] tracker_suite::two_start_end_test
+Running test tracker_suite/two_start_end_test
+                   [expect INIT]
+Waiting for connection...
+Connected to child: fd = 10
+1714161554.941038: LEGION: INIT
+1714161554.941072: LEGION: PROMPT
+1714161554.941090: Driver <~~ INIT (sent at 1714161554.941038)
+legion>                    [expect PROMPT]
+1714161554.941112: Driver <~~ PROMPT (sent at 1714161554.941072)
+>>> register lazy lazy
+                   [expect REGISTER]
+unknown command: register lazy lazy
+1714161554.941164: LEGION: PROMPT
+legion> 1714161554.941184: Driver <~~ PROMPT (sent at 1714161554.941164)
+Read event type PROMPT, expected type REGISTER
+Aborting test tracker_suite/two_start_end_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::two_start_end_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::unknown_quit_test
+Running test tracker_suite/unknown_quit_test
+                   [expect INIT]
+Waiting for connection...
+1714161555.013863: LEGION: INIT
+1714161555.013910: LEGION: PROMPT
+legion> Connected to child: fd = 10
+1714161555.014029: Driver <~~ INIT (sent at 1714161555.013863)
+                   [expect PROMPT]
+1714161555.014050: Driver <~~ PROMPT (sent at 1714161555.013910)
+>>> unknown
+                   [expect ERROR]
+unknown command: unknown
+1714161555.014098: LEGION: PROMPT
+legion> 1714161555.014120: Driver <~~ PROMPT (sent at 1714161555.014098)
+Read event type PROMPT, expected type ERROR
+Aborting test tracker_suite/unknown_quit_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::unknown_quit_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[RUN ] tracker_suite::unreg_error_test
+Running test tracker_suite/unreg_error_test
+                   [expect INIT]
+Waiting for connection...
+1714161555.085007: LEGION: INIT
+1714161555.085054: LEGION: PROMPT
+legion> Connected to child: fd = 10
+1714161555.085165: Driver <~~ INIT (sent at 1714161555.085007)
+                   [expect PROMPT]
+1714161555.085185: Driver <~~ PROMPT (sent at 1714161555.085054)
+>>> unregister unknown
+                   [expect ERROR]
+unknown command: unregister unknown
+1714161555.085233: LEGION: PROMPT
+legion> 1714161555.085254: Driver <~~ PROMPT (sent at 1714161555.085233)
+Read event type PROMPT, expected type ERROR
+Aborting test tracker_suite/unreg_error_test
+[----] tests/__helper.c:26: Assertion Failed
+[----]   
+[----]   The test driver returned an error (-1)
+[----]   
+[FAIL] tracker_suite::unreg_error_test: (0.00s)
+bin/legion: no process found
+crash: no process found
+lazy: no process found
+systat: no process found
+logcheck: no process found
+nosync: no process found
+[----] Writing xml report in `crit.xml`.
+[====] Synthesis: Tested: 34 | Passing: 5 | Failing: 29 | Crashing: 0 

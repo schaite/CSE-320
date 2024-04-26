@@ -1,0 +1,38 @@
+Graded Commit:03af8a14a80b5780dfa0c5f8675725dfba5c5b33
+
+TEST NAME, POINTS,OUT OF
+basecode_suite/eof_test,1,1,
+basecode_suite/quit_test,1,1,
+basecode_suite/start_single_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+basecode_suite/status_all_empty_test,1,1,
+basecode_suite/status_all_single_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+logcheck_suite/emptyspace_parse_test,0,1,1 assertion(s) failed.: tests/__helper.c:52: File 'logs/my emptyspace test.log.0' does not exist
+logcheck_suite/log_exists_test,0,1,1 assertion(s) failed.: tests/__helper.c:52: File 'logs/my_log.log.0' does not exist
+logcheck_suite/logrotate_test,0,1,1 assertion(s) failed.: tests/__helper.c:52: File 'logs/my_log_rot.log.0' does not exist
+logcheck_suite/register_extra_arg_test,0,1,1 assertion(s) failed.: tests/__helper.c:52: File 'logs/my_extra_arg.log.0' does not exist
+tracker_suite/crash_reset_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/crash_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/help_test,1,1,
+tracker_suite/lazy_start_stop_multi_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/logrotate_error_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/logrotate_lazy_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/logrotate_two_lazy_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/multi_lazy_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/nosync_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/quit_test,1,1,
+tracker_suite/regi_quit_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/regi_same_name_error_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/regi_unregi_mult_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/regi_unregi_quit_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/start_error_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/start_quit_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/start_stop_lazy_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/status_all_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/status_error_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/status_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/stop_error_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/systat_start_end_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/two_start_end_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/unknown_quit_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+tracker_suite/unreg_error_test,0,1,1 assertion(s) failed.: tests/__helper.c:26: The test driver returned an error (-1)
+total,5,34

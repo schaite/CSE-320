@@ -10,92 +10,93 @@
 #include <sys/socket.h>
 
 #include "debug.h"
-#include "csapp.h"
 #include "server.h"
 #include "globals.h"
+#include "csapp.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <errno.h>
-#include <signal.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
+static void terminate(int);
 
-static void terminate(int status);
-static void sighup_handler();
-
-extern char *optarg;
+void handler(int num){
+    terminate(EXIT_SUCCESS);
+}
 
 /*
  * "Charla" chat server.
  *
  * Usage: charla <port>
  */
-
-
 int main(int argc, char* argv[]){
-    int listenfd, *connfdp;
-    char* port;
-    socklen_t clientlen = sizeof(struct sockaddr_in);;
-    struct sockaddr_in clientaddr;
-    pthread_t tid;
-
     // Option processing should be performed here.
     // Option '-p <port>' is required in order to specify the port number
     // on which the server should listen.
-    int option = getopt(argc, argv, "p:");
-    if( option == 'p' ){
-        port = optarg;
-        if(port==NULL){
-            port = "2000";
+    int p_flag = 0, i= 1;
+    char* port = NULL;
+
+    for(; i<argc; i++){
+        if((strcmp(argv[i],"-p")==0)&&(i+1<argc)){
+            p_flag = 1;
+            port = argv[i+1];
+            break;
         }
     }
 
-    // Initialize registries
+    if(port == NULL){
+        fprintf(stderr, "Usage: %s -p <port>\n", argv[0]);
+        exit(EXIT_FAILURE);  // Terminate if port is not specified
+    }
+    if(p_flag == 0||(p_flag = 1 && i == argc)){
+        fprintf(stderr, "Usage: %s -p <port>\n",argv[0]);
+        terminate(EXIT_FAILURE);
+    }
+
+    if(argc != 3){
+        fprintf(stderr, "Usage: %s -p <port>\n",argv[0]);
+        terminate(EXIT_FAILURE);
+    }
+
+    // Perform required initializations of the client_registry and
+    // player_registry.
     user_registry = ureg_init();
     client_registry = creg_init();
 
-      // TODO: Set up the server socket and enter a loop to accept connections
+    //Installing SIGHUP handler using sigaction
+    struct sigaction action, old_action;
+
+    action.sa_handler = handler;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+
+    if(sigaction(SIGHUP, &action, &old_action)<0){
+        terminate(EXIT_FAILURE);
+    }
+
+    // TODO: Set up the server socket and enter a loop to accept connections
     // on this socket.  For each connection, a thread should be started to
     // run function charla_client_service().  In addition, you should install
     // a SIGHUP handler, so that receipt of SIGHUP will perform a clean
     // shutdown of the server.
+    
+    int listenfd, *connfd;
+    socklen_t clientlen;
+    struct sockaddr_storage clientaddr;
 
-    struct sigaction action, old_action;
-    action.sa_handler = sighup_handler;
-    sigemptyset(&action.sa_mask);
-    action.sa_flags = SA_RESTART;
+    listenfd = open_listenfd(argv[i+1]);
 
-    if( sigaction(SIGHUP, &action, &old_action) < 0 ) {
-        debug("sigaction error");
-    }
-
-    listenfd = open_listenfd(port);
-    if(listenfd<0) {
-        debug("open_listenfd error");
-    }
-
-    while(1) {
-        connfdp = malloc(sizeof(int));
-        if(connfdp==NULL) {
-            debug("malloc error");
+    while(1){
+        clientlen = (sizeof(struct sockaddr_storage));
+        connfd = malloc(sizeof(int));
+        memset(connfd, 0, sizeof(int));
+        *connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen);
+        if(*connfd<0){
+            free(connfd);
+            terminate(EXIT_FAILURE);
         }
-        *connfdp = accept(listenfd, (SA *)&clientaddr, &clientlen);
-        if(*connfdp<0) {
-            debug("accept error");
-        }
-        int ret;
-        if( (ret = pthread_create(&tid, NULL, chla_client_service, connfdp))!=0 ) {
-            debug("pthread_create error");
-        }
+        pthread_t tid;
+        pthread_create(&tid, NULL, chla_client_service, connfd);
     }
 
     fprintf(stderr, "You have to finish implementing main() "
-	    "before the PBX server will function.\n");
+	    "before the server will function.\n");
 
     terminate(EXIT_FAILURE);
 }
@@ -107,6 +108,7 @@ static void terminate(int status) {
     // Shut down all existing client connections.
     // This will trigger the eventual termination of service threads.
     creg_shutdown_all(client_registry);
+
     // Finalize modules.
     creg_fini(client_registry);
     ureg_fini(user_registry);
@@ -115,8 +117,5 @@ static void terminate(int status) {
     exit(status);
 }
 
-void sighup_handler() {
-    terminate(EXIT_SUCCESS); 
-}
 
 

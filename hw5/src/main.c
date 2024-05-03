@@ -50,6 +50,9 @@ int main(int argc, char* argv[]){
     int option = getopt(argc, argv, "p:");
     if( option == 'p' ){
         port = optarg;
+        if(port==NULL){
+            port = "2000";
+        }
     }
 
     // Initialize registries
@@ -117,74 +120,3 @@ void sighup_handler() {
 }
 
 
-
-// #define BACKLOG 10  // Number of pending connections in the queue
-
-// // Function prototypes
-// static void terminate(int);
-// static void handle_sighup(int);
-
-// /*
-//  * Entry point of the server.
-//  */
-// int main(int argc, char* argv[]) {
-//     char portStr[16]; // Buffer for the port string
-//     int listenfd, *connfd;
-//     socklen_t clientlen = sizeof(struct sockaddr_in);
-//     struct sockaddr_in clientaddr;
-//     pthread_t tid;
-
-//     // Parse command-line arguments
-//     if (argc != 3 || strcmp(argv[1], "-p") != 0) {
-//         fprintf(stderr, "Usage: %s -p <port>\n", argv[0]);
-//         exit(EXIT_FAILURE);
-//     }
-//     int port = atoi(argv[2]);
-//     sprintf(portStr, "%d", port); // Convert the port number to a string
-
-//     // Initialize registries
-//     user_registry = ureg_init();
-//     client_registry = creg_init();
-
-//     // Set up the server socket
-//     listenfd = Open_listenfd(portStr);
-//     if (listenfd < 0) {
-//         fprintf(stderr, "Failed to open listen socket\n");
-//         exit(EXIT_FAILURE);
-//     }
-
-//     // Install SIGHUP handler
-//     struct sigaction sa;
-//     memset(&sa, 0, sizeof(sa));
-//     sa.sa_handler = handle_sighup;
-//     sigaction(SIGHUP, &sa, NULL);
-
-//     // Accept loop
-//     while (1) {
-//         connfd = Malloc(sizeof(int));  // Allocate space to store the descriptor
-//         *connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen);
-
-//         // Start a new thread to handle the client
-//         Pthread_create(&tid, NULL, chla_client_service, connfd);
-//     }
-
-//     // Should never reach here
-//     terminate(EXIT_SUCCESS);
-// }
-
-// /*
-//  * Function called to cleanly shut down the server.
-//  */
-// static void terminate(int status) {
-//     creg_shutdown_all(client_registry);
-//     creg_fini(client_registry);
-//     ureg_fini(user_registry);
-//     exit(status);
-// }
-
-// /*
-//  * Signal handler for SIGHUP.
-//  */
-// static void handle_sighup(int signum) {
-//     terminate(EXIT_SUCCESS);
-// }

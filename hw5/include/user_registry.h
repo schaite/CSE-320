@@ -60,7 +60,6 @@ void ureg_fini(USER_REGISTRY *ureg);
  *
  */
 USER *ureg_register(USER_REGISTRY *ureg, char *handle);
-
 /*
  * Unregister a handle, removing it and the associated USER object from
  * the registry.  The reference count on the USER object is decreased by one.

@@ -42,7 +42,7 @@ int main(int argc, char* argv[]){
 
     if(port == NULL){
         fprintf(stderr, "Usage: %s -p <port>\n", argv[0]);
-        exit(EXIT_FAILURE);  // Terminate if port is not specified
+        exit(EXIT_SUCCESS);  // Terminate if port is not specified
     }
     if(p_flag == 0||(p_flag = 1 && i == argc)){
         fprintf(stderr, "Usage: %s -p <port>\n",argv[0]);
